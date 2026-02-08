@@ -1,10 +1,21 @@
-import { useState } from 'react'
-import DataTable from '../components/DataTable'
+ import { useState, useEffect } from 'react'
+import { FiSearch, FiFilter, FiDownload, FiPlus, FiEdit, FiTrash2, FiEye } from 'react-icons/fi'
 import Modal from '../components/Modal'
-import { FiSearch, FiFilter } from 'react-icons/fi'
+import Notification from '../components/Notification'
 
-const Users = ({ showToast }) => {
-  const [users, setUsers] = useState([
+const Users = () => {
+  const [users, setUsers] = useState([])
+  const [filteredUsers, setFilteredUsers] = useState([])
+  const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all')
+  const [roleFilter, setRoleFilter] = useState('all')
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [selectedUser, setSelectedUser] = useState(null)
+  const [notification, setNotification] = useState(null)
+
+  // Initial mock data
+  const initialUsers = [
     {
       id: 1,
       name: 'John Doe',
@@ -12,7 +23,9 @@ const Users = ({ showToast }) => {
       phone: '+1 (555) 123-4567',
       role: 'admin',
       status: 'active',
-      lastActive: '2 hours ago'
+      lastActive: '2 hours ago',
+      joinDate: '2024-01-15',
+      avatar: 'JD'
     },
     {
       id: 2,
@@ -21,7 +34,9 @@ const Users = ({ showToast }) => {
       phone: '+1 (555) 987-6543',
       role: 'manager',
       status: 'active',
-      lastActive: '1 day ago'
+      lastActive: '1 day ago',
+      joinDate: '2024-01-20',
+      avatar: 'JS'
     },
     {
       id: 3,
@@ -30,7 +45,9 @@ const Users = ({ showToast }) => {
       phone: '+1 (555) 456-7890',
       role: 'editor',
       status: 'pending',
-      lastActive: '3 days ago'
+      lastActive: '3 days ago',
+      joinDate: '2024-02-01',
+      avatar: 'RJ'
     },
     {
       id: 4,
@@ -39,106 +56,136 @@ const Users = ({ showToast }) => {
       phone: '+1 (555) 321-6547',
       role: 'viewer',
       status: 'inactive',
-      lastActive: '1 week ago'
+      lastActive: '1 week ago',
+      joinDate: '2024-02-10',
+      avatar: 'SW'
     }
-  ])
-
-  const [search, setSearch] = useState('')
-  const [statusFilter, setStatusFilter] = useState('all')
-  const [roleFilter, setRoleFilter] = useState('all')
-  const [showAddModal, setShowAddModal] = useState(false)
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [selectedUser, setSelectedUser] = useState(null)
-  const [newUser, setNewUser] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    role: 'user',
-    status: 'active'
-  })
-
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = search === '' || 
-      user.name.toLowerCase().includes(search.toLowerCase()) ||
-      user.email.toLowerCase().includes(search.toLowerCase())
-    
-    const matchesStatus = statusFilter === 'all' || user.status === statusFilter
-    const matchesRole = roleFilter === 'all' || user.role === roleFilter
-    
-    return matchesSearch && matchesStatus && matchesRole
-  })
-
-  const userColumns = [
-    {
-      key: 'name',
-      title: 'User',
-      render: (value, row) => (
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-blue to-primary-purple flex items-center justify-center text-white text-xs font-bold">
-            {row.name.split(' ').map(n => n[0]).join('')}
-          </div>
-          <div>
-            <div className="font-semibold">{value}</div>
-            <div className="text-xs text-gray-400">{row.phone}</div>
-          </div>
-        </div>
-      )
-    },
-    { key: 'email', title: 'Email' },
-    { 
-      key: 'role', 
-      title: 'Role',
-      render: (value) => (
-        <span className="status-badge bg-blue-500/10 text-blue-400">
-          {value.charAt(0).toUpperCase() + value.slice(1)}
-        </span>
-      )
-    },
-    { 
-      key: 'status', 
-      title: 'Status',
-      render: (value) => (
-        <span className={`status-badge ${
-          value === 'active' ? 'status-active' :
-          value === 'pending' ? 'status-pending' :
-          'status-inactive'
-        }`}>
-          {value.charAt(0).toUpperCase() + value.slice(1)}
-        </span>
-      )
-    },
-    { key: 'lastActive', title: 'Last Active' }
   ]
 
-  const handleAddUser = () => {
-    if (!newUser.name || !newUser.email) {
-      showToast('error', 'Validation Error', 'Please fill in all required fields')
-      return
-    }
+  useEffect(() => {
+    setUsers(initialUsers)
+    setFilteredUsers(initialUsers)
+  }, [])
 
-    const newUserObj = {
-      ...newUser,
+  useEffect(() => {
+    let result = users
+    
+    // Apply search filter
+    if (search) {
+      const searchLower = search.toLowerCase()
+      result = result.filter(user => 
+        user.name.toLowerCase().includes(searchLower) ||
+        user.email.toLowerCase().includes(searchLower) ||
+        user.phone.toLowerCase().includes(searchLower)
+      )
+    }
+    
+    // Apply status filter
+    if (statusFilter !== 'all') {
+      result = result.filter(user => user.status === statusFilter)
+    }
+    
+    // Apply role filter
+    if (roleFilter !== 'all') {
+      result = result.filter(user => user.role === roleFilter)
+    }
+    
+    setFilteredUsers(result)
+  }, [search, statusFilter, roleFilter, users])
+
+  const handleAddUser = (userData) => {
+    const newUser = {
       id: users.length + 1,
-      lastActive: 'Just now'
+      ...userData,
+      avatar: userData.name.split(' ').map(n => n[0]).join(''),
+      lastActive: 'Just now',
+      joinDate: new Date().toISOString().split('T')[0]
     }
-
-    setUsers([newUserObj, ...users])
-    setNewUser({
-      name: '',
-      email: '',
-      phone: '',
-      role: 'user',
-      status: 'active'
-    })
+    
+    setUsers([newUser, ...users])
     setShowAddModal(false)
-    showToast('success', 'User Added', `${newUser.name} has been added successfully`)
+    showNotification('success', 'User Added', `${userData.name} has been added successfully!`)
   }
 
-  const handleDeleteUser = () => {
-    setUsers(users.filter(user => user.id !== selectedUser.id))
+  const handleEditUser = (user) => {
+    setSelectedUser(user)
+    // In a real app, you'd open an edit modal with pre-filled data
+    showNotification('info', 'Edit User', `Editing ${user.name} - Implement edit functionality`)
+  }
+
+  const handleDeleteUser = (user) => {
+    setSelectedUser(user)
+    setShowDeleteModal(true)
+  }
+
+  const confirmDelete = () => {
+    setUsers(users.filter(u => u.id !== selectedUser.id))
     setShowDeleteModal(false)
+    showNotification('success', 'User Deleted', `${selectedUser.name} has been removed`)
     setSelectedUser(null)
-    showToast('success', 'User Deleted', 'User has been deleted successfully')
+  }
+
+  const exportUsers = () => {
+    const csv = convertToCSV(filteredUsers)
+    downloadCSV(csv, 'quantumdash-users.csv')
+    showNotification('success', 'Export Complete', 'Users exported to CSV file')
+  }
+
+  const convertToCSV = (data) => {
+    if (data.length === 0) return ''
+    const headers = ['Name', 'Email', 'Phone', 'Role', 'Status', 'Last Active', 'Join Date']
+    const rows = data.map(user => [
+      user.name,
+      user.email,
+      user.phone,
+      user.role,
+      user.status,
+      user.lastActive,
+      user.joinDate
+    ])
+    return [headers.join(','), ...rows.map(row => row.join(','))].join('\n')
+  }
+
+  const downloadCSV = (csv, filename) => {
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename
+    a.click()
+    window.URL.revokeObjectURL(url)
+  }
+
+  const showNotification = (type, title, message) => {
+    setNotification({ type, title, message })
+    setTimeout(() => setNotification(null), 5000)
+  }
+
+  const getStatusBadge = (status) => {
+    const classes = {
+      active: 'status-active',
+      pending: 'status-pending',
+      inactive: 'status-inactive'
+    }
+    return (
+      <span className={`status-badge ${classes[status] || 'status-inactive'}`}>
+        {status.charAt(0).toUpperCase() + status.slice(1)}
+      </span>
+    )
+  }
+
+  const getRoleBadge = (role) => {
+    const colors = {
+      admin: 'from-blue-500 to-cyan-500',
+      manager: 'from-purple-500 to-pink-500',
+      editor: 'from-green-500 to-emerald-500',
+      viewer: 'from-gray-500 to-gray-700'
+    }
+    return (
+      <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${colors[role] || 'from-gray-500 to-gray-700'} text-white`}>
+        {role.charAt(0).toUpperCase() + role.slice(1)}
+      </span>
+    )
   }
 
   return (
@@ -146,56 +193,65 @@ const Users = ({ showToast }) => {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold gradient-text mb-2">User Management</h1>
-        <p className="text-gray-400">Manage user accounts, roles, and permissions with full CRUD operations.</p>
+        <p className="text-gray-400">Manage user accounts, roles, and permissions with full CRUD operations</p>
       </div>
 
-      {/* Filters */}
+      {/* Controls */}
       <div className="glass-card p-6 mb-6">
-        <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-          <div className="flex flex-wrap gap-3">
-            <div className="relative">
-              <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Search users..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="form-input pl-10 w-64"
-              />
+        <div className="flex flex-col md:flex-row gap-4 md:items-center">
+          <div className="flex-1 flex flex-wrap gap-4">
+            <div className="flex-1 min-w-[200px]">
+              <div className="relative">
+                <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search users..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="form-input pl-10"
+                />
+              </div>
             </div>
             
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="form-input w-32"
-            >
-              <option value="all">All Status</option>
-              <option value="active">Active</option>
-              <option value="pending">Pending</option>
-              <option value="inactive">Inactive</option>
-            </select>
-            
-            <select
-              value={roleFilter}
-              onChange={(e) => setRoleFilter(e.target.value)}
-              className="form-input w-32"
-            >
-              <option value="all">All Roles</option>
-              <option value="admin">Admin</option>
-              <option value="manager">Manager</option>
-              <option value="editor">Editor</option>
-              <option value="viewer">Viewer</option>
-            </select>
+            <div className="flex gap-2">
+              <select 
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="form-input"
+              >
+                <option value="all">All Status</option>
+                <option value="active">Active</option>
+                <option value="pending">Pending</option>
+                <option value="inactive">Inactive</option>
+              </select>
+              
+              <select 
+                value={roleFilter}
+                onChange={(e) => setRoleFilter(e.target.value)}
+                className="form-input"
+              >
+                <option value="all">All Roles</option>
+                <option value="admin">Admin</option>
+                <option value="manager">Manager</option>
+                <option value="editor">Editor</option>
+                <option value="viewer">Viewer</option>
+              </select>
+            </div>
           </div>
           
           <div className="flex gap-3">
-            <button className="btn-secondary">
+            <button 
+              onClick={exportUsers}
+              className="btn-secondary flex items-center"
+            >
+              <FiDownload className="mr-2" />
               Export CSV
             </button>
             <button 
               onClick={() => setShowAddModal(true)}
-              className="btn-primary"
+              className="btn-primary flex items-center"
             >
+              <FiPlus className="mr-2" />
               Add User
             </button>
           </div>
@@ -203,22 +259,100 @@ const Users = ({ showToast }) => {
       </div>
 
       {/* Users Table */}
-      <DataTable
-        columns={userColumns}
-        data={filteredUsers}
-        onView={(user) => {
-          setSelectedUser(user)
-          showToast('info', 'View User', `Viewing ${user.name}'s details`)
-        }}
-        onEdit={(user) => {
-          setSelectedUser(user)
-          showToast('info', 'Edit User', `Editing ${user.name}`)
-        }}
-        onDelete={(user) => {
-          setSelectedUser(user)
-          setShowDeleteModal(true)
-        }}
-      />
+      <div className="glass-card p-6">
+        <div className="overflow-x-auto">
+          <table className="table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Contact</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Activity</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredUsers.map((user) => (
+                <tr key={user.id}>
+                  <td>
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold">
+                        {user.avatar}
+                      </div>
+                      <div>
+                        <div className="font-semibold">{user.name}</div>
+                        <div className="text-sm text-gray-400">Joined {user.joinDate}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="space-y-1">
+                      <div className="font-medium">{user.email}</div>
+                      <div className="text-sm text-gray-400">{user.phone}</div>
+                    </div>
+                  </td>
+                  <td>{getRoleBadge(user.role)}</td>
+                  <td>{getStatusBadge(user.status)}</td>
+                  <td>
+                    <div className="text-sm">
+                      <div className="font-medium">Last Active</div>
+                      <div className="text-gray-400">{user.lastActive}</div>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleEditUser(user)}
+                        className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
+                        title="Edit"
+                      >
+                        <FiEdit className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteUser(user)}
+                        className="w-8 h-8 flex items-center justify-center rounded-lg bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 transition-colors text-red-400"
+                        title="Delete"
+                      >
+                        <FiTrash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              
+              {filteredUsers.length === 0 && (
+                <tr>
+                  <td colSpan="6" className="text-center py-8 text-gray-400">
+                    No users found matching your criteria
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        
+        {/* Pagination */}
+        <div className="flex justify-between items-center mt-6 pt-6 border-t border-white/10">
+          <div className="text-sm text-gray-400">
+            Showing {filteredUsers.length} of {users.length} users
+          </div>
+          <div className="flex gap-2">
+            <button className="px-3 py-1 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+              Previous
+            </button>
+            <button className="px-3 py-1 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 text-white">
+              1
+            </button>
+            <button className="px-3 py-1 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+              2
+            </button>
+            <button className="px-3 py-1 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+              Next
+            </button>
+          </div>
+        </div>
+      </div>
 
       {/* Add User Modal */}
       <Modal
@@ -226,136 +360,151 @@ const Users = ({ showToast }) => {
         onClose={() => setShowAddModal(false)}
         title="Add New User"
       >
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-400 mb-2">
-              Full Name *
-            </label>
-            <input
-              type="text"
-              value={newUser.name}
-              onChange={(e) => setNewUser({...newUser, name: e.target.value})}
-              className="form-input"
-              placeholder="John Doe"
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-400 mb-2">
-              Email Address *
-            </label>
-            <input
-              type="email"
-              value={newUser.email}
-              onChange={(e) => setNewUser({...newUser, email: e.target.value})}
-              className="form-input"
-              placeholder="john@example.com"
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-400 mb-2">
-              Phone Number
-            </label>
-            <input
-              type="tel"
-              value={newUser.phone}
-              onChange={(e) => setNewUser({...newUser, phone: e.target.value})}
-              className="form-input"
-              placeholder="+1 (555) 123-4567"
-            />
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4">
+        <form onSubmit={(e) => {
+          e.preventDefault()
+          const formData = new FormData(e.target)
+          const userData = {
+            name: formData.get('name'),
+            email: formData.get('email'),
+            phone: formData.get('phone'),
+            role: formData.get('role'),
+            status: formData.get('status')
+          }
+          handleAddUser(userData)
+          e.target.reset()
+        }}>
+          <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">
-                Role
-              </label>
-              <select
-                value={newUser.role}
-                onChange={(e) => setNewUser({...newUser, role: e.target.value})}
+              <label className="block text-sm font-medium mb-2">Full Name *</label>
+              <input
+                name="name"
+                type="text"
+                required
                 className="form-input"
-              >
-                <option value="admin">Administrator</option>
-                <option value="manager">Manager</option>
-                <option value="editor">Editor</option>
-                <option value="viewer">Viewer</option>
-                <option value="user">User</option>
-              </select>
+                placeholder="John Doe"
+              />
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">
-                Status
-              </label>
-              <select
-                value={newUser.status}
-                onChange={(e) => setNewUser({...newUser, status: e.target.value})}
+              <label className="block text-sm font-medium mb-2">Email Address *</label>
+              <input
+                name="email"
+                type="email"
+                required
                 className="form-input"
+                placeholder="john@example.com"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium mb-2">Phone Number</label>
+              <input
+                name="phone"
+                type="tel"
+                className="form-input"
+                placeholder="+1 (555) 123-4567"
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">Role *</label>
+                <select name="role" className="form-input" required>
+                  <option value="">Select Role</option>
+                  <option value="admin">Administrator</option>
+                  <option value="manager">Manager</option>
+                  <option value="editor">Editor</option>
+                  <option value="viewer">Viewer</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-2">Status</label>
+                <select name="status" className="form-input">
+                  <option value="active">Active</option>
+                  <option value="pending">Pending</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
+            </div>
+            
+            <div className="pt-4">
+              <h4 className="text-sm font-medium mb-3">Permissions</h4>
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" defaultChecked className="rounded bg-white/5 border-white/10" />
+                  <span className="text-sm">Read Access</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" className="rounded bg-white/5 border-white/10" />
+                  <span className="text-sm">Write Access</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" className="rounded bg-white/5 border-white/10" />
+                  <span className="text-sm">Delete Access</span>
+                </label>
+              </div>
+            </div>
+            
+            <div className="flex justify-end gap-3 pt-6 border-t border-white/10">
+              <button
+                type="button"
+                onClick={() => setShowAddModal(false)}
+                className="btn-secondary"
               >
-                <option value="active">Active</option>
-                <option value="pending">Pending</option>
-                <option value="inactive">Inactive</option>
-              </select>
+                Cancel
+              </button>
+              <button type="submit" className="btn-primary">
+                Save User
+              </button>
             </div>
           </div>
-          
-          <div className="pt-4 flex justify-end gap-3">
-            <button
-              onClick={() => setShowAddModal(false)}
-              className="btn-secondary"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleAddUser}
-              className="btn-primary"
-            >
-              Add User
-            </button>
-          </div>
-        </div>
+        </form>
       </Modal>
 
       {/* Delete Confirmation Modal */}
       <Modal
         isOpen={showDeleteModal}
-        onClose={() => {
-          setShowDeleteModal(false)
-          setSelectedUser(null)
-        }}
+        onClose={() => setShowDeleteModal(false)}
         title="Confirm Delete"
         size="sm"
       >
         <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-500/10 flex items-center justify-center">
-            <FiAlertTriangle className="w-8 h-8 text-red-400" />
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-red-500 to-pink-500 flex items-center justify-center">
+            <FiTrash2 className="w-8 h-8 text-white" />
           </div>
           
-          <h4 className="text-lg font-semibold mb-2">Delete User</h4>
+          <h3 className="text-lg font-semibold mb-2">Delete User</h3>
           <p className="text-gray-400 mb-6">
-            Are you sure you want to delete {selectedUser?.name}? This action cannot be undone.
+            Are you sure you want to delete <span className="font-semibold text-white">{selectedUser?.name}</span>? This action cannot be undone.
           </p>
           
-          <div className="flex justify-center gap-3">
+          <div className="flex gap-3">
             <button
-              onClick={() => {
-                setShowDeleteModal(false)
-                setSelectedUser(null)
-              }}
-              className="btn-secondary"
+              onClick={() => setShowDeleteModal(false)}
+              className="btn-secondary flex-1"
             >
               Cancel
             </button>
             <button
-              onClick={handleDeleteUser}
-              className="btn-primary bg-gradient-to-r from-red-500 to-pink-500"
+              onClick={confirmDelete}
+              className="btn-primary flex-1 bg-gradient-to-r from-red-500 to-pink-500"
             >
-              Delete User
+              Delete
             </button>
           </div>
         </div>
       </Modal>
+
+      {/* Notification */}
+      {notification && (
+        <Notification
+          type={notification.type}
+          title={notification.title}
+          message={notification.message}
+          onClose={() => setNotification(null)}
+        />
+      )}
     </div>
   )
 }
