@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+
+import { useState, useEffect } from 'react'  // ADDED THIS IMPORT
 import { FiFilter, FiRefreshCw, FiDownload, FiEye, FiTrendingUp, FiTrendingDown } from 'react-icons/fi'
 import ChartCard from '../components/ChartCard'
 
