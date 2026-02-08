@@ -110,9 +110,9 @@ const Sidebar = ({ collapsed, currentPage, onNavigate, onToggle, isMobile }) => 
         )}
       </div>
 
-      {/* Navigation - Scrollable area */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden py-4 scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-gray-800">
-        <nav className="px-4">
+      {/* Navigation - Scrollable area with FIXED height */}
+      <div className="flex-1 overflow-y-auto overflow-x-hidden" style={{ maxHeight: 'calc(100vh - 180px)' }}>
+        <nav className="p-4">
           {navItems.map((group) => (
             <div key={group.title} className="mb-6">
               {(!collapsed || isMobile || mobileOpen) && (
@@ -149,8 +149,8 @@ const Sidebar = ({ collapsed, currentPage, onNavigate, onToggle, isMobile }) => 
         </nav>
       </div>
 
-      {/* User Profile */}
-      <div className="p-4 border-t border-white/10 flex-shrink-0 bg-[#0a0a1a]/95 backdrop-blur-lg">
+      {/* User Profile - FIXED at bottom */}
+      <div className="p-4 border-t border-white/10 flex-shrink-0 bg-[#0a0a1a]/95 backdrop-blur-lg mt-auto">
         <div className="flex items-center gap-3 p-2 sm:p-3 rounded-xl hover:bg-white/5 transition-colors">
           <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold flex-shrink-0 text-sm sm:text-base">
             JD
