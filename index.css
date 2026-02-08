@@ -10,13 +10,16 @@
   }
 
   * {
-    @apply border-border;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
   }
 
   body {
     @apply bg-dark-bg text-gray-100 font-sans antialiased;
     background: radial-gradient(ellipse at top, theme('colors.dark.darker') 0%, theme('colors.dark.bg') 100%);
     min-height: 100vh;
+    overflow-x: hidden;
   }
 
   /* Custom Scrollbar */
@@ -48,10 +51,6 @@
 
   .gradient-text {
     @apply bg-gradient-to-r from-primary-blue via-primary-purple to-primary-pink bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient;
-  }
-
-  .gradient-border {
-    @apply relative before:absolute before:inset-0 before:rounded-2xl before:p-[2px] before:bg-gradient-to-r before:from-primary-blue before:via-primary-purple before:to-primary-pink before:-z-10;
   }
 
   .btn-primary {
