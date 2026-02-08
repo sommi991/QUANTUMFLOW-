@@ -1,4 +1,5 @@
-import { useState } from 'react'
+
+import { useState } from 'react'  // ADDED THIS IMPORT
 import { FiShoppingBag, FiBox, FiClock, FiAlertCircle, FiPlus, FiEye, FiEdit, FiTrendingUp, FiTrendingDown } from 'react-icons/fi'
 import ChartCard from '../components/ChartCard'
 import DataTable from '../components/DataTable'
@@ -54,7 +55,7 @@ const ECommerce = () => {
       category: 'Electronics',
       price: 299.99,
       sales: 1248,
-      revenue: 374,351,
+      revenue: 374351,
       stock: 45,
       rating: 4.8
     },
@@ -64,7 +65,7 @@ const ECommerce = () => {
       category: 'Wearables',
       price: 199.99,
       sales: 892,
-      revenue: 178,391,
+      revenue: 178391,
       stock: 28,
       rating: 4.6
     },
@@ -74,7 +75,7 @@ const ECommerce = () => {
       category: 'Food & Beverage',
       price: 24.99,
       sales: 2156,
-      revenue: 53,874,
+      revenue: 53874,
       stock: 156,
       rating: 4.9
     },
@@ -84,7 +85,7 @@ const ECommerce = () => {
       category: 'Fitness',
       price: 49.99,
       sales: 745,
-      revenue: 37,243,
+      revenue: 37243,
       stock: 12,
       rating: 4.7
     }
