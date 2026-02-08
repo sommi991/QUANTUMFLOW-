@@ -10,7 +10,7 @@ A modern, feature-rich admin dashboard built with React, Vite, and Tailwind CSS.
 
 ## ✨ Live Demo
 👉 **[View Live Demo]
-(https://quantumflow.netlify.app)
+(https://quantumfluw.netlify.app)
 ## 📸 Preview
 ![Dashboard Preview](https://via.placeholder.com/800x450/0f172a/3b82f6?text=QuantumDash+Pro+Dashboard)
 *Replace with actual screenshot after deployment*
