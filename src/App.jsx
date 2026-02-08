@@ -18,6 +18,22 @@ function App() {
     title: '',
     message: ''
   })
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Detect mobile screen
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+      // Auto-collapse sidebar on mobile
+      if (window.innerWidth < 768) {
+        setSidebarCollapsed(true)
+      }
+    }
+
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   const showToast = (type, title, message) => {
     setNotificationData({ type, title, message })
@@ -40,17 +56,22 @@ function App() {
   const navigateTo = (page) => {
     setCurrentPage(page)
     localStorage.setItem('quantumdash_page', page)
+    // Auto-close sidebar on mobile after navigation
+    if (isMobile) {
+      setSidebarCollapsed(true)
+    }
   }
 
   useEffect(() => {
+    // Load saved preferences
     const savedPage = localStorage.getItem('quantumdash_page') || 'dashboard'
     const savedSidebar = localStorage.getItem('quantumdash_sidebar') === 'true'
     const savedTheme = localStorage.getItem('quantumdash_theme') || 'dark'
 
     setCurrentPage(savedPage)
-    setSidebarCollapsed(savedSidebar)
+    setSidebarCollapsed(isMobile ? true : savedSidebar) // Always collapsed on mobile
     setTheme(savedTheme)
-  }, [])
+  }, [isMobile])
 
   const renderPage = () => {
     switch (currentPage) {
@@ -77,17 +98,23 @@ function App() {
           currentPage={currentPage}
           onNavigate={navigateTo}
           onToggle={toggleSidebar}
+          isMobile={isMobile}
         />
         
-        <div className={`flex-1 transition-all duration-300 ${sidebarCollapsed ? 'ml-20' : 'ml-72'}`}>
+        <div className={`flex-1 transition-all duration-300 ${
+          sidebarCollapsed 
+            ? isMobile ? 'ml-0' : 'ml-16 md:ml-20' 
+            : isMobile ? 'ml-0' : 'ml-72 lg:ml-80'
+        }`}>
           <Header
             sidebarCollapsed={sidebarCollapsed}
             onToggleSidebar={toggleSidebar}
             onToggleTheme={toggleTheme}
             theme={theme}
+            isMobile={isMobile}
           />
           
-          <main className="p-6">
+          <main className="p-4 sm:p-6 md:p-8">
             {renderPage()}
           </main>
         </div>
@@ -99,6 +126,14 @@ function App() {
           title={notificationData.title}
           message={notificationData.message}
           onClose={() => setShowNotification(false)}
+        />
+      )}
+
+      {/* Mobile overlay when sidebar is open */}
+      {!sidebarCollapsed && isMobile && (
+        <div 
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30 lg:hidden"
+          onClick={() => setSidebarCollapsed(true)}
         />
       )}
     </div>
