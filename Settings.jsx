@@ -1,4 +1,5 @@
-import { useState } from 'react'
+
+import { useState } from 'react'  // ADDED THIS IMPORT
 import { FiSave, FiRefreshCw, FiMoon, FiSun, FiUser, FiBell, FiShield, FiGlobe, FiDatabase } from 'react-icons/fi'
 
 const Settings = ({ showToast }) => {
@@ -37,7 +38,6 @@ const Settings = ({ showToast }) => {
   ]
 
   const handleSave = () => {
-    // Save to localStorage
     localStorage.setItem('quantumdash_settings', JSON.stringify(settings))
     showToast('success', 'Settings Saved', 'Your settings have been saved successfully!')
   }
