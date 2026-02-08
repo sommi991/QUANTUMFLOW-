@@ -1,6 +1,4 @@
 import { FiHome, FiBarChart2, FiShoppingCart, FiUsers, FiBox, FiFileText, FiInbox, FiCalendar, FiFolder, FiSettings, FiHelpCircle, FiChevronLeft, FiChevronRight, FiLogOut } from 'react-icons/fi'
-import { HiOutlineBell, HiOutlineEnvelope } from 'react-icons/hi'
-import { useState } from 'react'
 
 const Sidebar = ({ collapsed, currentPage, onNavigate, onToggle }) => {
   const [user] = useState({
