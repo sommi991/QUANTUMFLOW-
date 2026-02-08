@@ -1,3 +1,4 @@
+import { useState } from 'react'  // ADDED THIS IMPORT
 import { FiHome, FiBarChart2, FiShoppingCart, FiUsers, FiBox, FiFileText, FiInbox, FiCalendar, FiFolder, FiSettings, FiHelpCircle, FiChevronLeft, FiChevronRight, FiLogOut } from 'react-icons/fi'
 
 const Sidebar = ({ collapsed, currentPage, onNavigate, onToggle }) => {
