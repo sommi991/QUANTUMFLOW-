@@ -18,28 +18,28 @@ const Dashboard = () => {
       value: 24589,
       change: 12.5,
       icon: FiDollarSign,
-      color: 'bg-gradient-to-br from-primary-blue to-primary-purple'
+      color: 'from-blue-500 to-purple-500'
     },
     {
       title: 'Active Users',
       value: 1248,
       change: 8.2,
       icon: FiUsers,
-      color: 'bg-gradient-to-br from-green-500 to-emerald-500'
+      color: 'from-green-500 to-emerald-500'
     },
     {
       title: 'New Orders',
       value: 342,
       change: -3.1,
       icon: FiShoppingCart,
-      color: 'bg-gradient-to-br from-yellow-500 to-orange-500'
+      color: 'from-yellow-500 to-orange-500'
     },
     {
       title: 'Pending Issues',
       value: 12,
       change: -25,
       icon: FiAlertTriangle,
-      color: 'bg-gradient-to-br from-red-500 to-pink-500'
+      color: 'from-red-500 to-pink-500'
     }
   ]
 
@@ -105,11 +105,12 @@ const Dashboard = () => {
   ]
 
   const orderColumns = [
-    { key: 'id', title: 'Order ID' },
-    { key: 'customer', title: 'Customer' },
+    { key: 'id', title: 'Order ID', className: 'min-w-[120px]' },
+    { key: 'customer', title: 'Customer', className: 'min-w-[150px]' },
     { 
       key: 'date', 
       title: 'Date',
+      className: 'min-w-[120px]',
       render: (value) => new Date(value).toLocaleDateString('en-US', {
         month: 'short',
         day: 'numeric',
@@ -119,16 +120,18 @@ const Dashboard = () => {
     { 
       key: 'amount', 
       title: 'Amount',
+      className: 'min-w-[100px]',
       render: (value) => `$${value.toFixed(2)}`
     },
     { 
       key: 'status', 
       title: 'Status',
+      className: 'min-w-[120px]',
       render: (value) => (
-        <span className={`status-badge ${
-          value === 'completed' ? 'status-active' :
-          value === 'processing' ? 'status-pending' :
-          'status-inactive'
+        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
+          value === 'completed' ? 'bg-green-500/10 text-green-500 border border-green-500/20' :
+          value === 'processing' ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20' :
+          'bg-red-500/10 text-red-500 border border-red-500/20'
         }`}>
           {value.charAt(0).toUpperCase() + value.slice(1)}
         </span>
@@ -137,25 +140,25 @@ const Dashboard = () => {
   ]
 
   return (
-    <div>
+    <div className="w-full">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold gradient-text mb-2">Dashboard Overview</h1>
-        <p className="text-gray-400">Welcome back, John! Here's what's happening with your business today.</p>
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold gradient-text mb-2">Dashboard Overview</h1>
+        <p className="text-sm sm:text-base text-gray-400">Welcome back, John! Here's what's happening with your business today.</p>
       </div>
 
       {/* Date Range */}
-      <div className="glass-card p-6 mb-6">
-        <div className="flex justify-between items-center">
+      <div className="glass-card p-4 sm:p-6 mb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h3 className="text-lg font-bold">Performance Overview</h3>
-            <p className="text-sm text-gray-400">Last 30 days</p>
+            <h3 className="text-base sm:text-lg font-bold">Performance Overview</h3>
+            <p className="text-xs sm:text-sm text-gray-400">Last 30 days</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="w-full sm:w-auto">
             <select 
               value={dateRange}
               onChange={(e) => setDateRange(e.target.value)}
-              className="form-input w-48"
+              className="form-input w-full sm:w-48"
             >
               <option value="today">Today</option>
               <option value="yesterday">Yesterday</option>
@@ -169,7 +172,7 @@ const Dashboard = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
         {stats.map((stat, index) => (
           <StatsCard
             key={index}
@@ -184,12 +187,13 @@ const Dashboard = () => {
       </div>
 
       {/* Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
         <ChartCard
           title="Revenue Overview"
           type="line"
           data={revenueData}
           action="View Details"
+          height={250}
         />
         
         <ChartCard
@@ -197,6 +201,7 @@ const Dashboard = () => {
           type="doughnut"
           data={trafficData}
           action="Refresh"
+          height={250}
         />
         
         <ChartCard
@@ -213,6 +218,7 @@ const Dashboard = () => {
             }]
           }}
           action="Daily"
+          height={250}
         />
         
         <ChartCard
@@ -229,16 +235,19 @@ const Dashboard = () => {
             }]
           }}
           action="By Revenue"
+          height={250}
         />
       </div>
 
       {/* Recent Orders Table */}
-      <DataTable
-        title="Recent Orders"
-        columns={orderColumns}
-        data={orders}
-        actions={true}
-      />
+      <div className="w-full overflow-x-auto">
+        <DataTable
+          title="Recent Orders"
+          columns={orderColumns}
+          data={orders}
+          actions={true}
+        />
+      </div>
     </div>
   )
 }
