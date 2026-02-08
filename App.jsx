@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+ import { useState, useEffect } from 'react'
 import Sidebar from './components/Sidebar'
 import Header from './components/Header'
 import Dashboard from './pages/Dashboard'
@@ -12,7 +12,6 @@ function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [currentPage, setCurrentPage] = useState('dashboard')
   const [theme, setTheme] = useState('dark')
-  const [notifications, setNotifications] = useState([])
   const [showNotification, setShowNotification] = useState(false)
   const [notificationData, setNotificationData] = useState({
     type: 'success',
