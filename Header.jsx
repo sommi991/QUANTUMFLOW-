@@ -60,4 +60,3 @@ const Header = ({ sidebarCollapsed, onToggleSidebar, onToggleTheme, theme }) => 
 }
 
 export default Header
-
