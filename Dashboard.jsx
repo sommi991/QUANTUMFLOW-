@@ -6,9 +6,7 @@ import {
   FiDollarSign, 
   FiUsers, 
   FiShoppingCart, 
-  FiAlertTriangle,
-  FiTrendingUp,
-  FiTrendingDown
+  FiAlertTriangle
 } from 'react-icons/fi'
 
 const Dashboard = () => {
@@ -148,21 +146,25 @@ const Dashboard = () => {
 
       {/* Date Range */}
       <div className="glass-card p-6 mb-6">
-        <div className="flex items-center justify-between">
+        <div className="flex justify-between items-center">
           <div>
-            <h3 className="text-lg font-bold mb-1">Performance Overview</h3>
+            <h3 className="text-lg font-bold">Performance Overview</h3>
             <p className="text-sm text-gray-400">Last 30 days</p>
           </div>
-          <select
-            value={dateRange}
-            onChange={(e) => setDateRange(e.target.value)}
-            className="form-input w-48"
-          >
-            <option value="last7days">Last 7 Days</option>
-            <option value="last30days">Last 30 Days</option>
-            <option value="last90days">Last 90 Days</option>
-            <option value="thisYear">This Year</option>
-          </select>
+          <div className="flex items-center gap-2">
+            <select 
+              value={dateRange}
+              onChange={(e) => setDateRange(e.target.value)}
+              className="form-input w-48"
+            >
+              <option value="today">Today</option>
+              <option value="yesterday">Yesterday</option>
+              <option value="last7days">Last 7 Days</option>
+              <option value="last30days">Last 30 Days</option>
+              <option value="thismonth">This Month</option>
+              <option value="lastmonth">Last Month</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -171,8 +173,12 @@ const Dashboard = () => {
         {stats.map((stat, index) => (
           <StatsCard
             key={index}
-            {...stat}
-            isCurrency={index === 0}
+            title={stat.title}
+            value={stat.value}
+            change={stat.change}
+            icon={stat.icon}
+            color={stat.color}
+            isCurrency={stat.title.includes('Revenue')}
           />
         ))}
       </div>
@@ -183,6 +189,7 @@ const Dashboard = () => {
           title="Revenue Overview"
           type="line"
           data={revenueData}
+          action="View Details"
         />
         
         <ChartCard
@@ -191,13 +198,46 @@ const Dashboard = () => {
           data={trafficData}
           action="Refresh"
         />
+        
+        <ChartCard
+          title="User Acquisition"
+          type="bar"
+          data={{
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [{
+              label: 'New Users',
+              data: [65, 59, 80, 81, 56, 55, 40],
+              backgroundColor: 'rgba(59, 130, 246, 0.7)',
+              borderColor: '#3b82f6',
+              borderWidth: 2
+            }]
+          }}
+          action="Daily"
+        />
+        
+        <ChartCard
+          title="Top Products"
+          type="bar"
+          data={{
+            labels: ['Product A', 'Product B', 'Product C', 'Product D', 'Product E'],
+            datasets: [{
+              label: 'Sales',
+              data: [45, 38, 29, 24, 18],
+              backgroundColor: 'rgba(139, 92, 246, 0.7)',
+              borderColor: '#8b5cf6',
+              borderWidth: 2
+            }]
+          }}
+          action="By Revenue"
+        />
       </div>
 
-      {/* Recent Orders */}
+      {/* Recent Orders Table */}
       <DataTable
         title="Recent Orders"
         columns={orderColumns}
         data={orders}
+        actions={true}
         onView={(row) => console.log('View:', row)}
         onEdit={(row) => console.log('Edit:', row)}
         onDelete={(row) => console.log('Delete:', row)}
