@@ -1,35 +1,102 @@
-import { FiTrendingUp, FiTrendingDown } from 'react-icons/fi'
+import { Bar, Line, Pie, Doughnut } from 'react-chartjs-2'
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+} from 'chart.js'
 
-const StatsCard = ({ title, value, change, icon: Icon, color, isCurrency = false }) => {
-  const isPositive = change >= 0
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+)
+
+const ChartCard = ({ title, type = 'line', data, options, action }) => {
+  const chartConfig = {
+    line: Line,
+    bar: Bar,
+    pie: Pie,
+    doughnut: Doughnut
+  }
   
+  const ChartComponent = chartConfig[type]
+
+  const defaultOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: {
+          color: '#94a3b8',
+          padding: 20,
+          usePointStyle: true
+        }
+      },
+      tooltip: {
+        backgroundColor: 'rgba(30, 41, 59, 0.95)',
+        borderColor: 'rgba(255, 255, 255, 0.1)',
+        borderWidth: 1,
+        titleColor: '#f1f5f9',
+        bodyColor: '#94a3b8',
+        padding: 12,
+        cornerRadius: 8
+      }
+    },
+    scales: {
+      y: {
+        grid: {
+          color: 'rgba(255, 255, 255, 0.05)',
+          drawBorder: false
+        },
+        ticks: {
+          color: '#94a3b8'
+        }
+      },
+      x: {
+        grid: {
+          color: 'rgba(255, 255, 255, 0.05)',
+          drawBorder: false
+        },
+        ticks: {
+          color: '#94a3b8'
+        }
+      }
+    },
+    ...options
+  }
+
   return (
-    <div className="stat-card">
-      <div className="flex items-center gap-4">
-        <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${color}`}>
-          <Icon className="w-7 h-7 text-white" />
-        </div>
-        
-        <div className="flex-1">
-          <div className="text-2xl font-bold">
-            {isCurrency ? '$' : ''}{value.toLocaleString()}
-          </div>
-          <div className="text-sm text-gray-400">{title}</div>
-        </div>
-        
-        <div className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold ${
-          isPositive ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'
-        }`}>
-          {isPositive ? (
-            <FiTrendingUp className="w-4 h-4" />
-          ) : (
-            <FiTrendingDown className="w-4 h-4" />
-          )}
-          <span>{Math.abs(change)}%</span>
-        </div>
+    <div className="glass-card p-6">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-lg font-bold">{title}</h3>
+        {action && (
+          <button className="btn-secondary text-sm">
+            {action}
+          </button>
+        )}
+      </div>
+      
+      <div className="h-64">
+        <ChartComponent data={data} options={defaultOptions} />
       </div>
     </div>
   )
 }
 
-export default StatsCard
+export default ChartCard
