@@ -1,17 +1,19 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense, lazy } from 'react'
 import Sidebar from './components/Sidebar'
 import Header from './components/Header'
-import Dashboard from './pages/Dashboard'
-import Users from './pages/Users'
-import Analytics from './pages/Analytics'
-import ECommerce from './pages/ECommerce'
-import Settings from './pages/Settings'
 import Notification from './components/Notification'
-import Calendar from './pages/Calendar'
-import Chat from './pages/Chat'
-import Email from './pages/Email'
-import Profile from './pages/Profile'
-import Invoice from './pages/Invoice'
+
+// Lazy load pages for better performance
+const Dashboard = lazy(() => import('./pages/Dashboard'))
+const Users = lazy(() => import('./pages/Users'))
+const Analytics = lazy(() => import('./pages/Analytics'))
+const ECommerce = lazy(() => import('./pages/ECommerce'))
+const Settings = lazy(() => import('./pages/Settings'))
+const Calendar = lazy(() => import('./pages/Calendar'))
+const Chat = lazy(() => import('./pages/Chat'))
+const Email = lazy(() => import('./pages/Email'))
+const Profile = lazy(() => import('./pages/Profile'))
+const Invoice = lazy(() => import('./pages/Invoice'))
 
 function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -24,7 +26,7 @@ function App() {
     message: ''
   })
   const [isMobile, setIsMobile] = useState(false)
-  const [isLoading, setIsLoading] = useState(true) // Add loading state
+  const [isLoading, setIsLoading] = useState(true)
 
   // Detect mobile screen
   useEffect(() => {
@@ -39,7 +41,16 @@ function App() {
 
     checkMobile()
     window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
+    
+    // Hide loading after components are ready
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 300)
+
+    return () => {
+      window.removeEventListener('resize', checkMobile)
+      clearTimeout(timer)
+    }
   }, [])
 
   const showToast = (type, title, message) => {
@@ -78,49 +89,40 @@ function App() {
     setCurrentPage(savedPage)
     setSidebarCollapsed(isMobile ? true : savedSidebar)
     setTheme(savedTheme)
-    
-    // Hide loading after a short delay
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 100)
   }, [isMobile])
 
   const renderPage = () => {
-    switch (currentPage) {
-      case 'dashboard':
-        return <Dashboard />
-      case 'users':
-        return <Users showToast={showToast} />
-      case 'analytics':
-        return <Analytics />
-      case 'ecommerce':
-        return <ECommerce />
-      case 'settings':
-        return <Settings showToast={showToast} />
-      case 'calendar':
-        return <Calendar />
-      case 'chat':
-        return <Chat />
-      case 'email':
-        return <Email />
-      case 'profile':
-        return <Profile />
-      case 'invoice':
-        return <Invoice />
-      default:
-        return <Dashboard />
-    }
+    const LoadingFallback = () => (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    )
+
+    return (
+      <Suspense fallback={<LoadingFallback />}>
+        {currentPage === 'dashboard' && <Dashboard />}
+        {currentPage === 'users' && <Users showToast={showToast} />}
+        {currentPage === 'analytics' && <Analytics />}
+        {currentPage === 'ecommerce' && <ECommerce />}
+        {currentPage === 'settings' && <Settings showToast={showToast} />}
+        {currentPage === 'calendar' && <Calendar />}
+        {currentPage === 'chat' && <Chat />}
+        {currentPage === 'email' && <Email />}
+        {currentPage === 'profile' && <Profile />}
+        {currentPage === 'invoice' && <Invoice />}
+      </Suspense>
+    )
   }
 
   // Show loading screen
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-dark-bg flex items-center justify-center">
+      <div className="min-h-screen bg-[#0a0a1a] flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-primary-blue to-primary-purple flex items-center justify-center text-white font-bold text-2xl animate-pulse">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-2xl animate-pulse">
             Q
           </div>
-          <h2 className="text-xl font-bold gradient-text">QuantumDash</h2>
+          <h2 className="text-xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">QuantumDash</h2>
           <p className="text-gray-400 mt-2">Loading...</p>
         </div>
       </div>
@@ -151,8 +153,8 @@ function App() {
             isMobile={isMobile}
           />
           
-          <main className="p-4 sm:p-6 md:p-8 w-full overflow-x-auto">
-            <div className="min-w-[320px]"> {/* Ensure minimum width for mobile */}
+          <main className="p-4 sm:p-6 md:p-8 w-full overflow-x-hidden">
+            <div className="min-w-0"> {/* Prevent horizontal overflow */}
               {renderPage()}
             </div>
           </main>
@@ -165,14 +167,6 @@ function App() {
           title={notificationData.title}
           message={notificationData.message}
           onClose={() => setShowNotification(false)}
-        />
-      )}
-
-      {/* Mobile overlay when sidebar is open */}
-      {!sidebarCollapsed && isMobile && (
-        <div 
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30 lg:hidden"
-          onClick={() => setSidebarCollapsed(true)}
         />
       )}
     </div>
