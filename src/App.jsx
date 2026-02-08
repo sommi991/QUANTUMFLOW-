@@ -7,6 +7,11 @@ import Analytics from './pages/Analytics'
 import ECommerce from './pages/ECommerce'
 import Settings from './pages/Settings'
 import Notification from './components/Notification'
+import Calendar from './pages/Calendar'
+import Chat from './pages/Chat'
+import Email from './pages/Email'
+import Profile from './pages/Profile'
+import Invoice from './pages/Invoice'
 
 function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -85,6 +90,16 @@ function App() {
         return <ECommerce />
       case 'settings':
         return <Settings showToast={showToast} />
+      case 'calendar':
+        return <Calendar />
+      case 'chat':
+        return <Chat />
+      case 'email':
+        return <Email />
+      case 'profile':
+        return <Profile />
+      case 'invoice':
+        return <Invoice />
       default:
         return <Dashboard />
     }
