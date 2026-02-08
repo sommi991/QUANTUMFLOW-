@@ -1,3 +1,5 @@
+
+import { useState } from 'react'  // ADDED THIS IMPORT
 import { FiSearch, FiBell, FiMail, FiMoon, FiSun, FiMaximize2, FiMenu } from 'react-icons/fi'
 
 const Header = ({ sidebarCollapsed, onToggleSidebar, onToggleTheme, theme }) => {
