@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+
+import { useState, useEffect } from 'react'  // ADDED THIS IMPORT
 import { FiFilter, FiRefreshCw, FiDownload, FiEye, FiTrendingUp, FiTrendingDown } from 'react-icons/fi'
 import ChartCard from '../components/ChartCard'
 
@@ -308,3 +309,65 @@ const Analytics = () => {
               { title: 'User Growth Analysis', updated: '2 days ago' },
               { title: 'Product Performance', updated: '1 week ago' }
             ].map((report, index) => (
+              <div key={index} className="flex items-center justify-between p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+                <div>
+                  <div className="font-semibold">{report.title}</div>
+                  <div className="text-sm text-gray-400">Last updated: {report.updated}</div>
+                </div>
+                <div className="flex gap-2">
+                  <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+                    <FiEye className="w-4 h-4" />
+                  </button>
+                  <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+                    <FiDownload className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Real-time Analytics */}
+      <div className="glass-card p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h3 className="text-lg font-bold">Real-time Analytics</h3>
+            <div className="flex items-center gap-2 mt-1">
+              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              <span className="text-sm text-gray-400">Live data updating every 10 seconds</span>
+            </div>
+          </div>
+          <button className="btn-secondary text-sm">
+            <FiRefreshCw className="mr-2" />
+            Refresh Now
+          </button>
+        </div>
+        
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="text-center p-4 bg-white/5 rounded-xl">
+            <div className="text-3xl font-bold">{liveData.visitors.toLocaleString()}</div>
+            <div className="text-sm text-gray-400">Active Visitors</div>
+          </div>
+          
+          <div className="text-center p-4 bg-white/5 rounded-xl">
+            <div className="text-3xl font-bold">{liveData.conversions}</div>
+            <div className="text-sm text-gray-400">Conversions (Last hour)</div>
+          </div>
+          
+          <div className="text-center p-4 bg-white/5 rounded-xl">
+            <div className="text-3xl font-bold">${liveData.revenue.toLocaleString()}</div>
+            <div className="text-sm text-gray-400">Revenue (Today)</div>
+          </div>
+          
+          <div className="text-center p-4 bg-white/5 rounded-xl">
+            <div className="text-3xl font-bold">{liveData.orders}</div>
+            <div className="text-sm text-gray-400">Orders (Today)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default Analytics
