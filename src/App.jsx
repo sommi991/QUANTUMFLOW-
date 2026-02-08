@@ -24,13 +24,15 @@ function App() {
     message: ''
   })
   const [isMobile, setIsMobile] = useState(false)
+  const [isLoading, setIsLoading] = useState(true) // Add loading state
 
   // Detect mobile screen
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768)
+      const mobile = window.innerWidth < 768
+      setIsMobile(mobile)
       // Auto-collapse sidebar on mobile
-      if (window.innerWidth < 768) {
+      if (mobile) {
         setSidebarCollapsed(true)
       }
     }
@@ -74,8 +76,13 @@ function App() {
     const savedTheme = localStorage.getItem('quantumdash_theme') || 'dark'
 
     setCurrentPage(savedPage)
-    setSidebarCollapsed(isMobile ? true : savedSidebar) // Always collapsed on mobile
+    setSidebarCollapsed(isMobile ? true : savedSidebar)
     setTheme(savedTheme)
+    
+    // Hide loading after a short delay
+    setTimeout(() => {
+      setIsLoading(false)
+    }, 100)
   }, [isMobile])
 
   const renderPage = () => {
@@ -105,6 +112,21 @@ function App() {
     }
   }
 
+  // Show loading screen
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-dark-bg flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-primary-blue to-primary-purple flex items-center justify-center text-white font-bold text-2xl animate-pulse">
+            Q
+          </div>
+          <h2 className="text-xl font-bold gradient-text">QuantumDash</h2>
+          <p className="text-gray-400 mt-2">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'dark' : ''}`}>
       <div className="flex">
@@ -116,7 +138,7 @@ function App() {
           isMobile={isMobile}
         />
         
-        <div className={`flex-1 transition-all duration-300 ${
+        <div className={`flex-1 w-full transition-all duration-300 ${
           sidebarCollapsed 
             ? isMobile ? 'ml-0' : 'ml-16 md:ml-20' 
             : isMobile ? 'ml-0' : 'ml-72 lg:ml-80'
@@ -129,8 +151,10 @@ function App() {
             isMobile={isMobile}
           />
           
-          <main className="p-4 sm:p-6 md:p-8">
-            {renderPage()}
+          <main className="p-4 sm:p-6 md:p-8 w-full overflow-x-auto">
+            <div className="min-w-[320px]"> {/* Ensure minimum width for mobile */}
+              {renderPage()}
+            </div>
           </main>
         </div>
       </div>
