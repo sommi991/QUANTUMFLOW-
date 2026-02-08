@@ -1,9 +1,9 @@
- import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'  // ADDED THIS IMPORT
 import { FiSearch, FiFilter, FiDownload, FiPlus, FiEdit, FiTrash2, FiEye } from 'react-icons/fi'
 import Modal from '../components/Modal'
 import Notification from '../components/Notification'
 
-const Users = () => {
+const Users = ({ showToast }) => {
   const [users, setUsers] = useState([])
   const [filteredUsers, setFilteredUsers] = useState([])
   const [search, setSearch] = useState('')
@@ -104,13 +104,12 @@ const Users = () => {
     
     setUsers([newUser, ...users])
     setShowAddModal(false)
-    showNotification('success', 'User Added', `${userData.name} has been added successfully!`)
+    showToast('success', 'User Added', `${userData.name} has been added successfully!`)
   }
 
   const handleEditUser = (user) => {
     setSelectedUser(user)
-    // In a real app, you'd open an edit modal with pre-filled data
-    showNotification('info', 'Edit User', `Editing ${user.name} - Implement edit functionality`)
+    showToast('info', 'Edit User', `Editing ${user.name} - Implement edit functionality`)
   }
 
   const handleDeleteUser = (user) => {
@@ -121,14 +120,14 @@ const Users = () => {
   const confirmDelete = () => {
     setUsers(users.filter(u => u.id !== selectedUser.id))
     setShowDeleteModal(false)
-    showNotification('success', 'User Deleted', `${selectedUser.name} has been removed`)
+    showToast('success', 'User Deleted', `${selectedUser.name} has been removed`)
     setSelectedUser(null)
   }
 
   const exportUsers = () => {
     const csv = convertToCSV(filteredUsers)
     downloadCSV(csv, 'quantumdash-users.csv')
-    showNotification('success', 'Export Complete', 'Users exported to CSV file')
+    showToast('success', 'Export Complete', 'Users exported to CSV file')
   }
 
   const convertToCSV = (data) => {
@@ -154,11 +153,6 @@ const Users = () => {
     a.download = filename
     a.click()
     window.URL.revokeObjectURL(url)
-  }
-
-  const showNotification = (type, title, message) => {
-    setNotification({ type, title, message })
-    setTimeout(() => setNotification(null), 5000)
   }
 
   const getStatusBadge = (status) => {
@@ -495,16 +489,6 @@ const Users = () => {
           </div>
         </div>
       </Modal>
-
-      {/* Notification */}
-      {notification && (
-        <Notification
-          type={notification.type}
-          title={notification.title}
-          message={notification.message}
-          onClose={() => setNotification(null)}
-        />
-      )}
     </div>
   )
 }
