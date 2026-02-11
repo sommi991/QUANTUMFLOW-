@@ -16,20 +16,15 @@ export default {
       },
       colors: {
         // Futuristic color palette
-        dark: {
-          bg: '#0a0a1a',
-          darker: '#050510',
-          card: 'rgba(15, 15, 35, 0.9)',
-          sidebar: 'rgba(15, 15, 35, 0.95)'
-        },
+        'dark-bg': '#0a0a1a',  // FIXED: Changed from object to string
+        'darker-bg': '#050510', // FIXED: Changed from object to string
+        'card-bg': 'rgba(15, 15, 35, 0.9)',
+        'sidebar-bg': 'rgba(15, 15, 35, 0.95)',
         neon: {
           blue: '#00f3ff',
           purple: '#b967ff',
           pink: '#ff2d95',
           green: '#00ff9d'
-        },
-        primary: {
-          gradient: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 25%, #ec4899 50%, #f97316 75%, #f59e0b 100%)'
         }
       },
       fontSize: {
@@ -77,10 +72,10 @@ export default {
         },
         'pulse-glow': {
           '0%, 100%': { 
-            'box-shadow': '0 0 10px rgba(99, 102, 241, 0.3)',
+            boxShadow: '0 0 10px rgba(99, 102, 241, 0.3)', // FIXED: quotes around boxShadow
           },
           '50%': { 
-            'box-shadow': '0 0 20px rgba(99, 102, 241, 0.5)',
+            boxShadow: '0 0 20px rgba(99, 102, 241, 0.5)', // FIXED: quotes around boxShadow
           }
         },
         'slide-up': {
@@ -126,3 +121,4 @@ export default {
   },
   plugins: [],
 }
+
