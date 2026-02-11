@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -23,17 +24,16 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
+    -webkit-tap-highlight-color: transparent;
   }
 
   html {
-    font-size: 14px; /* Base font size for mobile */
+    font-size: 14px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    overflow-x: hidden; /* Prevent horizontal scroll */
+    overflow-x: hidden;
   }
 
-  /* Responsive font sizes */
   @media (min-width: 640px) {
     html {
       font-size: 15px;
@@ -47,112 +47,30 @@
   }
 
   body {
-    @apply bg-dark-bg text-gray-100 font-sans;
-    background: radial-gradient(ellipse at top, var(--darker-bg) 0%, var(--dark-bg) 100%);
+    background: var(--dark-bg);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
     min-height: 100vh;
-    min-height: -webkit-fill-available; /* Mobile viewport fix */
+    min-height: -webkit-fill-available;
     overflow-x: hidden;
     line-height: 1.6;
-    touch-action: manipulation; /* Improve touch responsiveness */
+    touch-action: manipulation;
   }
 
-  /* Safe area insets for modern phones (notch support) */
-  .safe-area-top {
-    padding-top: env(safe-area-inset-top);
-  }
-
-  .safe-area-bottom {
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-
-  .safe-area-left {
-    padding-left: env(safe-area-inset-left);
-  }
-
-  .safe-area-right {
-    padding-right: env(safe-area-inset-right);
-  }
-
-  /* Mobile-first responsive typography */
-  h1 {
-    font-size: 1.5rem; /* Smaller on mobile */
-    line-height: 2rem;
-    font-weight: 700;
-    color: var(--text-primary);
-  }
-
-  h2 {
-    font-size: 1.25rem;
-    line-height: 1.75rem;
-    font-weight: 600;
-    color: var(--text-primary);
-  }
-
-  h3 {
-    font-size: 1.125rem;
-    line-height: 1.5rem;
-    font-weight: 600;
-    color: var(--text-primary);
-  }
-
-  p {
-    font-size: 0.875rem; /* 14px base */
-    line-height: 1.5;
-    color: var(--text-secondary);
-  }
-
-  @media (min-width: 640px) {
-    h1 {
-      font-size: 1.875rem;
-      line-height: 2.25rem;
-    }
-    
-    h2 {
-      font-size: 1.5rem;
-      line-height: 2rem;
-    }
-    
-    h3 {
-      font-size: 1.25rem;
-      line-height: 1.75rem;
-    }
-    
-    p {
-      font-size: 1rem;
-    }
-  }
-
-  @media (min-width: 1024px) {
-    h1 {
-      font-size: 2.25rem;
-      line-height: 2.5rem;
-    }
-    
-    h2 {
-      font-size: 1.875rem;
-      line-height: 2.25rem;
-    }
-    
-    h3 {
-      font-size: 1.5rem;
-      line-height: 2rem;
-    }
-  }
-
-  /* Custom Scrollbar - hide on mobile */
   @media (min-width: 768px) {
     ::-webkit-scrollbar {
-      @apply w-2 h-2;
+      width: 8px;
+      height: 8px;
     }
 
     ::-webkit-scrollbar-track {
       background: rgba(0, 0, 0, 0.2);
-      @apply rounded;
+      border-radius: 4px;
     }
 
     ::-webkit-scrollbar-thumb {
       background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 25%, #ec4899 50%);
-      @apply rounded;
+      border-radius: 4px;
     }
 
     ::-webkit-scrollbar-thumb:hover {
@@ -162,14 +80,14 @@
 }
 
 @layer components {
-  /* ==================== MOBILE-FIRST GLASS EFFECTS ==================== */
+  /* ==================== GLASS EFFECTS ==================== */
   .glass-card {
     background: var(--glass-bg);
-    backdrop-filter: blur(10px); /* Less blur on mobile for performance */
+    backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--glass-border);
-    border-radius: 0.75rem; /* Smaller radius on mobile */
-    @apply shadow-lg;
+    border-radius: 0.75rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     color: var(--text-primary);
   }
 
@@ -181,66 +99,18 @@
     }
   }
 
-  .glass-sidebar {
-    background: rgba(15, 15, 35, 0.98); /* More opaque on mobile */
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border-right: 1px solid rgba(255, 255, 255, 0.05);
-  }
-
-  @media (min-width: 640px) {
-    .glass-sidebar {
-      background: rgba(15, 15, 35, 0.95);
-      backdrop-filter: blur(30px);
-      -webkit-backdrop-filter: blur(30px);
-    }
-  }
-
-  /* ==================== MOBILE-FRIENDLY BUTTONS ==================== */
-  .btn-primary {
-    @apply w-full sm:w-auto px-4 py-3.5 text-sm sm:text-base; /* Full width on mobile */
-    background: var(--primary-gradient);
-    color: white;
-    font-weight: 600;
-    border-radius: 0.75rem;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    min-height: 44px; /* Minimum touch target */
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-  }
-
-  .btn-primary:hover:not(:active) {
-    transform: translateY(-1px);
-  }
-
-  .btn-secondary {
-    @apply w-full sm:w-auto px-4 py-3.5 text-sm sm:text-base;
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--text-primary);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 0.75rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    min-height: 44px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-  }
-
-  /* ==================== MOBILE FORM ELEMENTS ==================== */
+  /* ==================== CRITICAL FIX - FORM INPUTS ==================== */
   .form-input {
-    @apply w-full px-4 py-3 text-base; /* Larger font on mobile */
+    width: 100%;
+    padding: 0.75rem 1rem;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 0.75rem;
     color: var(--text-primary);
     transition: all 0.2s ease;
-    min-height: 44px; /* Better touch target */
+    min-height: 44px;
+    font-size: 16px !important;
+    outline: none;
   }
 
   .form-input:focus {
@@ -254,48 +124,92 @@
     color: rgba(160, 160, 208, 0.6);
   }
 
-  /* iOS input zoom fix */
-  @media screen and (max-width: 768px) {
-    input,
-    select,
-    textarea {
-      font-size: 16px !important; /* Prevent iOS zoom on focus */
-    }
+  .form-input option {
+    background: var(--dark-bg);
+    color: var(--text-primary);
+    padding: 0.5rem;
   }
 
-  /* ==================== MOBILE-FIRST LAYOUT ==================== */
-  .mobile-container {
-    @apply px-4 sm:px-6 md:px-8 lg:px-12;
-    max-width: 100%;
-    margin: 0 auto;
+  select.form-input {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23a0a0d0'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.5rem;
+    padding-right: 2.5rem;
   }
 
-  .mobile-grid {
-    @apply grid grid-cols-1 gap-4; /* Single column on mobile */
+  /* ==================== BUTTONS ==================== */
+  .btn-primary {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    background: var(--primary-gradient);
+    color: white;
+    font-weight: 600;
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    border: none;
+    cursor: pointer;
   }
 
   @media (min-width: 640px) {
-    .mobile-grid {
-      @apply grid-cols-2 gap-6; /* 2 columns on tablet */
+    .btn-primary {
+      width: auto;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
     }
   }
 
-  @media (min-width: 1024px) {
-    .mobile-grid {
-      @apply grid-cols-3 gap-8; /* 3 columns on desktop */
+  .btn-secondary {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+  }
+
+  @media (min-width: 640px) {
+    .btn-secondary {
+      width: auto;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
     }
   }
 
-  /* ==================== STATS CARDS ==================== */
+  /* ==================== STAT CARDS ==================== */
   .stat-card {
-    @apply glass-card p-4 transition-all duration-300;
-    margin-bottom: 0.75rem; /* Space between stacked cards on mobile */
+    @apply glass-card p-4 transition-all duration-300 cursor-pointer;
   }
 
   @media (min-width: 640px) {
     .stat-card {
       @apply p-6;
-      margin-bottom: 0;
     }
     
     .stat-card:hover {
@@ -304,68 +218,80 @@
     }
   }
 
-  /* ==================== MOBILE NAVIGATION ==================== */
-  .nav-link {
-    @apply flex items-center gap-2 px-3 py-3; /* Larger tap target */
-    color: var(--text-secondary);
-    border-radius: 0.75rem;
-    transition: all 0.2s ease;
-    min-height: 44px; /* Minimum touch target */
+  /* ==================== STATUS BADGES ==================== */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    min-height: 28px;
+  }
+
+  .status-active, .status-completed {
+    background: rgba(0, 255, 157, 0.1);
+    color: var(--neon-green);
+    border: 1px solid rgba(0, 255, 157, 0.3);
+  }
+
+  .status-pending, .status-processing {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+  }
+
+  .status-cancelled, .status-inactive {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+  }
+
+  /* ==================== TABLES ==================== */
+  .table-container {
+    @apply glass-card overflow-x-auto;
+    -webkit-overflow-scrolling: touch;
+    margin-left: -1rem;
+    margin-right: -1rem;
+    border-radius: 0;
   }
 
   @media (min-width: 640px) {
-    .nav-link {
-      @apply gap-3 px-4 py-3;
+    .table-container {
+      margin-left: 0;
+      margin-right: 0;
+      border-radius: 1rem;
     }
-  }
-
-  .nav-link:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--text-primary);
-  }
-
-  .nav-link.active {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
-    color: var(--text-primary);
-  }
-
-  /* Left border only on desktop */
-  @media (min-width: 1024px) {
-    .nav-link.active {
-      border-left: 4px solid #6366f1;
-    }
-  }
-
-  /* ==================== MOBILE TABLES ==================== */
-  .table-container {
-    @apply glass-card rounded-xl overflow-x-auto -mx-4 sm:mx-0; /* Full width scroll on mobile */
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
   }
 
   .table {
-    @apply w-full min-w-[600px] sm:min-w-0; /* Allow horizontal scroll on mobile */
+    width: 100%;
+    min-width: 600px;
+    border-collapse: collapse;
   }
 
   .table th {
-    @apply px-3 py-3 sm:px-4 sm:py-4 text-left text-xs font-semibold;
+    padding: 0.75rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 600;
     color: var(--text-secondary);
     background: rgba(255, 255, 255, 0.05);
-    white-space: nowrap; /* Prevent text wrapping in headers */
+    white-space: nowrap;
   }
 
   .table td {
-    @apply px-3 py-3 sm:px-4 sm:py-4 text-xs sm:text-sm;
+    padding: 0.75rem;
+    font-size: 0.75rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    vertical-align: middle;
     color: var(--text-primary);
   }
 
-  /* Compact table on mobile */
-  @media (max-width: 640px) {
+  @media (min-width: 640px) {
     .table th,
     .table td {
-      padding: 0.75rem 0.5rem;
-      font-size: 0.75rem;
+      padding: 1rem;
+      font-size: 0.875rem;
     }
   }
 
@@ -373,55 +299,74 @@
     background: rgba(255, 255, 255, 0.03);
   }
 
-  /* ==================== MOBILE-FRIENDLY CHARTS ==================== */
-  .chart-container {
-    height: 200px; /* Shorter on mobile */
-    width: 100%;
-    position: relative;
-  }
-
-  @media (min-width: 640px) {
-    .chart-container {
-      height: 250px;
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .chart-container {
-      height: 300px;
-    }
-  }
-
-  /* ==================== MOBILE MODALS ==================== */
+  /* ==================== MODALS ==================== */
   .modal-overlay {
-    @apply fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-start justify-center p-4 overflow-y-auto safe-area-top safe-area-bottom;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(5px);
+    z-index: 50;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 1rem;
+    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
 
   .modal-content {
-    @apply glass-card w-full max-w-full sm:max-w-md md:max-w-lg my-auto;
+    @apply glass-card;
+    width: 100%;
+    max-width: 100%;
+    margin: auto;
     max-height: calc(100vh - 2rem);
     overflow-y: auto;
   }
 
-  /* ==================== UTILITY CLASSES ==================== */
-  .hide-on-mobile {
-    @apply hidden sm:block;
+  @media (min-width: 640px) {
+    .modal-content {
+      max-width: 28rem;
+    }
   }
 
-  .show-on-mobile {
-    @apply block sm:hidden;
+  @media (min-width: 768px) {
+    .modal-content {
+      max-width: 32rem;
+    }
   }
 
-  .mobile-padding {
-    @apply p-4 sm:p-6 md:p-8;
+  /* ==================== CART SIDEBAR ==================== */
+  .cart-sidebar {
+    position: fixed;
+    inset-y: 0;
+    right: 0;
+    width: 100%;
+    background: var(--dark-bg);
+    border-left: 1px solid var(--glass-border);
+    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.3);
+    z-index: 50;
   }
 
-  .mobile-margin {
-    @apply -mx-4 sm:mx-0; /* Negative margin for full-width mobile elements */
+  @media (min-width: 640px) {
+    .cart-sidebar {
+      width: 24rem;
+    }
   }
 
-  /* ==================== ANIMATIONS (Reduced on mobile) ==================== */
+  /* ==================== ANIMATIONS ==================== */
+  @keyframes slideInRight {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  .animate-slide-in-right {
+    animation: slideInRight 0.3s ease-out;
+  }
+
   @keyframes gradient {
     0%, 100% {
       background-position: 0% 50%;
@@ -438,71 +383,10 @@
     background-clip: text;
     background-size: 200% auto;
   }
-
-  /* Reduce animations on mobile for better performance */
-  @media (prefers-reduced-motion: no-preference) and (min-width: 768px) {
-    .gradient-text {
-      animation: gradient 8s linear infinite;
-    }
-    
-    .animate-float {
-      animation: float 6s ease-in-out infinite;
-    }
-  }
-
-  @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-  }
-
-  @keyframes slide-up {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .animate-slide-up {
-    animation: slide-up 0.4s ease-out;
-  }
-
-  /* ==================== STATUS BADGES ==================== */
-  .status-badge {
-    @apply inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold;
-    min-height: 24px; /* Minimum touch target */
-  }
-
-  .status-active {
-    background: rgba(0, 255, 157, 0.1);
-    color: var(--neon-green);
-    border: 1px solid rgba(0, 255, 157, 0.3);
-  }
-
-  .status-pending {
-    background: rgba(245, 158, 11, 0.1);
-    color: #f59e0b;
-    border: 1px solid rgba(245, 158, 11, 0.3);
-  }
-
-  .status-inactive {
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--text-secondary);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
-  @media (min-width: 640px) {
-    .status-badge {
-      @apply px-3 py-1;
-    }
-  }
 }
 
 @layer utilities {
-  /* ==================== MOBILE UTILITIES ==================== */
+  /* ==================== UTILITIES ==================== */
   .touch-target {
     min-height: 44px;
     min-width: 44px;
@@ -517,11 +401,6 @@
     display: none;
   }
 
-  .text-balance {
-    text-wrap: balance;
-  }
-
-  /* Text truncation with ellipsis */
   .truncate-1 {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -535,40 +414,6 @@
     overflow: hidden;
   }
 
-  .truncate-3 {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  /* Safe area utilities */
-  .pt-safe {
-    padding-top: env(safe-area-inset-top);
-  }
-  
-  .pb-safe {
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-  
-  .pl-safe {
-    padding-left: env(safe-area-inset-left);
-  }
-  
-  .pr-safe {
-    padding-right: env(safe-area-inset-right);
-  }
-
-  /* Responsive spacing */
-  .gap-responsive {
-    @apply gap-3 sm:gap-4 md:gap-6;
-  }
-
-  .p-responsive {
-    @apply p-4 sm:p-6 md:p-8;
-  }
-
-  /* Hide content visually but keep for screen readers */
   .sr-only {
     position: absolute;
     width: 1px;
@@ -582,131 +427,12 @@
   }
 }
 
-/* ==================== MOBILE-FIRST MEDIA QUERIES ==================== */
-
-/* Extra Small Phones (under 375px) */
-@media (max-width: 374px) {
-  .mobile-container {
-    @apply px-3;
-  }
-  
-  h1 {
-    font-size: 1.25rem;
-    line-height: 1.75rem;
-  }
-  
-  h2 {
-    font-size: 1.125rem;
-    line-height: 1.5rem;
-  }
-  
-  .glass-card {
-    border-radius: 0.5rem;
-  }
-  
-  .btn-primary,
-  .btn-secondary {
-    padding: 0.75rem 0.875rem;
-    font-size: 0.8125rem;
-  }
-}
-
-/* Small Phones (375px - 639px) */
-@media (min-width: 375px) and (max-width: 639px) {
-  .mobile-container {
-    @apply px-4;
-  }
-}
-
-/* Tablets (640px - 767px) */
-@media (min-width: 640px) and (max-width: 767px) {
-  .mobile-container {
-    @apply px-6;
-  }
-  
-  .mobile-grid {
-    gap: 1rem;
-  }
-}
-
-/* Large Tablets (768px - 1023px) */
-@media (min-width: 768px) and (max-width: 1023px) {
-  .mobile-container {
-    @apply px-8;
-  }
-}
-
-/* Desktop (1024px and up) */
-@media (min-width: 1024px) {
-  .mobile-container {
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-  
-  /* Desktop-only hover effects */
-  .hover-lift:hover {
-    transform: translateY(-4px);
-    transition: transform 0.3s ease;
-  }
-}
-
 /* ==================== TOUCH DEVICE OPTIMIZATIONS ==================== */
 @media (hover: none) and (pointer: coarse) {
-  /* Remove hover effects on touch devices */
   .btn-primary:hover,
   .btn-secondary:hover,
-  .nav-link:hover,
   .stat-card:hover {
     transform: none !important;
-  }
-  
-  /* Increase tap targets */
-  .touch-target-large {
-    min-height: 48px;
-    min-width: 48px;
-  }
-  
-  /* Improve scrolling on iOS */
-  .scroll-touch {
-    -webkit-overflow-scrolling: touch;
-  }
-}
-
-/* ==================== PRINT STYLES ==================== */
-@media print {
-  * {
-    background: transparent !important;
-    color: black !important;
-    box-shadow: none !important;
-    text-shadow: none !important;
-  }
-  
-  .no-print {
-    display: none !important;
-  }
-  
-  .print-only {
-    display: block !important;
-  }
-  
-  body {
-    font-size: 12pt;
-    line-height: 1.5;
-    background: white !important;
-  }
-  
-  h1 {
-    font-size: 18pt;
-    margin-bottom: 0.5in;
-    color: black !important;
-  }
-  
-  .glass-card {
-    border: 1px solid #000 !important;
-    box-shadow: none !important;
-    break-inside: avoid; /* Prevent cards from breaking across pages */
-    background: white !important;
-    color: black !important;
   }
 }
 
@@ -719,30 +445,5 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     animation-delay: 0.01ms !important;
-  }
-}
-
-/* ==================== HIGH CONTRAST MODE ==================== */
-@media (prefers-contrast: high) {
-  :root {
-    --text-primary: #ffffff;
-    --text-secondary: #cccccc;
-    --glass-border: rgba(255, 255, 255, 0.3);
-  }
-  
-  .glass-card {
-    border-width: 2px;
-  }
-}
-
-/* ==================== ORIENTATION SPECIFIC ==================== */
-@media (orientation: landscape) and (max-width: 900px) {
-  /* Landscape optimizations for mobile */
-  .mobile-grid {
-    @apply grid-cols-2; /* 2 columns in landscape */
-  }
-  
-  .chart-container {
-    height: 180px; /* Shorter charts in landscape */
   }
 }
