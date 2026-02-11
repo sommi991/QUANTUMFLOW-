@@ -16,15 +16,29 @@ export default {
       },
       colors: {
         // Futuristic color palette
-        'dark-bg': '#0a0a1a',  // FIXED: Changed from object to string
-        'darker-bg': '#050510', // FIXED: Changed from object to string
-        'card-bg': 'rgba(15, 15, 35, 0.9)',
-        'sidebar-bg': 'rgba(15, 15, 35, 0.95)',
+        dark: {
+          bg: '#0a0a1a',
+          darker: '#050510',
+          card: 'rgba(15, 15, 35, 0.9)',
+          sidebar: 'rgba(15, 15, 35, 0.95)'
+        },
         neon: {
           blue: '#00f3ff',
           purple: '#b967ff',
           pink: '#ff2d95',
           green: '#00ff9d'
+        },
+        primary: {
+          50: '#eff6ff',
+          100: '#dbeafe',
+          200: '#bfdbfe',
+          300: '#93c5fd',
+          400: '#60a5fa',
+          500: '#3b82f6',
+          600: '#2563eb',
+          700: '#1d4ed8',
+          800: '#1e40af',
+          900: '#1e3a8a',
         }
       },
       fontSize: {
@@ -54,16 +68,17 @@ export default {
         'slide-up': 'slide-up 0.6s ease-out',
         'slide-in-left': 'slide-in-left 0.8s ease-out',
         'slide-in-right': 'slide-in-right 0.8s ease-out',
+        'slide-in-right-quick': 'slide-in-right 0.3s ease-out',
       },
       keyframes: {
         gradient: {
           '0%, 100%': {
-            'background-size': '200% 200%',
-            'background-position': 'left center'
+            'backgroundSize': '200% 200%',
+            'backgroundPosition': 'left center'
           },
           '50%': {
-            'background-size': '200% 200%',
-            'background-position': 'right center'
+            'backgroundSize': '200% 200%',
+            'backgroundPosition': 'right center'
           }
         },
         float: {
@@ -72,10 +87,10 @@ export default {
         },
         'pulse-glow': {
           '0%, 100%': { 
-            boxShadow: '0 0 10px rgba(99, 102, 241, 0.3)', // FIXED: quotes around boxShadow
+            boxShadow: '0 0 10px rgba(99, 102, 241, 0.3)',
           },
           '50%': { 
-            boxShadow: '0 0 20px rgba(99, 102, 241, 0.5)', // FIXED: quotes around boxShadow
+            boxShadow: '0 0 20px rgba(99, 102, 241, 0.5)',
           }
         },
         'slide-up': {
@@ -116,6 +131,10 @@ export default {
         'xl': '1rem',
         '2xl': '1.5rem',
         '3xl': '2rem',
+      },
+      backgroundImage: {
+        'primary-gradient': 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 25%, #ec4899 50%, #f97316 75%, #f59e0b 100%)',
+        'glass-gradient': 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
       }
     },
   },
