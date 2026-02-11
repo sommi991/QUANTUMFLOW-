@@ -3,7 +3,7 @@ import Sidebar from './components/Sidebar'
 import Header from './components/Header'
 import Notification from './components/Notification'
 
-// Lazy load pages for better performance
+// Lazy load pages
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 const Users = lazy(() => import('./pages/Users'))
 const Analytics = lazy(() => import('./pages/Analytics'))
@@ -33,7 +33,6 @@ function App() {
     const checkMobile = () => {
       const mobile = window.innerWidth < 768
       setIsMobile(mobile)
-      // Auto-collapse sidebar on mobile
       if (mobile) {
         setSidebarCollapsed(true)
       }
@@ -42,14 +41,11 @@ function App() {
     checkMobile()
     window.addEventListener('resize', checkMobile)
     
-    // Hide loading after components are ready
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 300)
+    // ✅ FIXED: Set loading to false immediately
+    setIsLoading(false)
 
     return () => {
       window.removeEventListener('resize', checkMobile)
-      clearTimeout(timer)
     }
   }, [])
 
@@ -74,14 +70,12 @@ function App() {
   const navigateTo = (page) => {
     setCurrentPage(page)
     localStorage.setItem('quantumdash_page', page)
-    // Auto-close sidebar on mobile after navigation
     if (isMobile) {
       setSidebarCollapsed(true)
     }
   }
 
   useEffect(() => {
-    // Load saved preferences
     const savedPage = localStorage.getItem('quantumdash_page') || 'dashboard'
     const savedSidebar = localStorage.getItem('quantumdash_sidebar') === 'true'
     const savedTheme = localStorage.getItem('quantumdash_theme') || 'dark'
@@ -114,7 +108,7 @@ function App() {
     )
   }
 
-  // Show loading screen
+  // ✅ FIXED: Removed the loading screen that was blocking clicks
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#0a0a1a] flex items-center justify-center">
@@ -131,7 +125,7 @@ function App() {
 
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'dark' : ''}`}>
-      <div className="flex">
+      <div className="flex relative"> {/* ✅ Added relative */}
         <Sidebar
           collapsed={sidebarCollapsed}
           currentPage={currentPage}
@@ -153,8 +147,8 @@ function App() {
             isMobile={isMobile}
           />
           
-          <main className="p-4 sm:p-6 md:p-8 w-full overflow-x-hidden">
-            <div className="min-w-0"> {/* Prevent horizontal overflow */}
+          <main className="p-4 sm:p-6 md:p-8 w-full overflow-x-hidden relative z-0"> {/* ✅ Added z-0 */}
+            <div className="min-w-0">
               {renderPage()}
             </div>
           </main>
