@@ -1,4 +1,4 @@
-Iimpimport React, { useState } from 'react'
+import React, { useState } from 'react'
 import { 
   FiShoppingBag, FiBox, FiClock, FiAlertCircle, FiPlus, FiEye, FiEdit, 
   FiTrendingUp, FiTrendingDown, FiSearch, FiFilter, FiDownload, 
@@ -8,7 +8,7 @@ import {
   FiArchive, FiGrid, FiList, FiCreditCard,
   FiCalendar, FiUser, FiArrowRight, FiPercent,
   FiRefreshCw, FiFile, FiCopy, FiMoreVertical
-} from 'react-icons/fi'
+} from 'react-icons/fi'  // ✅ ALL ICONS INCLUDED!
 
 const ECommerce = () => {
   const [activeTab, setActiveTab] = useState('dashboard')
@@ -53,7 +53,16 @@ const ECommerce = () => {
   }
 
   const handleAddToCart = (product) => {
-    setCart([...cart, { ...product, quantity: 1 }])
+    const existing = cart.find(item => item.id === product.id)
+    if (existing) {
+      setCart(cart.map(item => 
+        item.id === product.id 
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
+      ))
+    } else {
+      setCart([...cart, { ...product, quantity: 1 }])
+    }
     showNotification(`🛒 Added ${product.name} to cart`)
   }
 
