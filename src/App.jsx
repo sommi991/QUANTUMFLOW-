@@ -1,9 +1,9 @@
-imporimport React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import Sidebar from './components/Sidebar'
 import Header from './components/Header'
 import Notification from './components/Notification'
 
-// 🔴 FIX: IMPORT DIRECTLY INSTEAD OF LAZY LOADING
+// Import all pages
 import Dashboard from './pages/Dashboard'
 import Users from './pages/Users'
 import Analytics from './pages/Analytics'
@@ -26,21 +26,32 @@ function App() {
     message: ''
   })
   const [isMobile, setIsMobile] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
 
   // Detect mobile screen
   useEffect(() => {
     const checkMobile = () => {
       const mobile = window.innerWidth < 768
       setIsMobile(mobile)
-      if (mobile) {
-        setSidebarCollapsed(true)
-      }
+      if (mobile) setSidebarCollapsed(true)
     }
     checkMobile()
     window.addEventListener('resize', checkMobile)
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
+
+  // Load saved preferences
+  useEffect(() => {
+    const savedPage = localStorage.getItem('currentPage') || 'ecommerce'
+    const savedSidebar = localStorage.getItem('sidebarCollapsed') === 'true'
+    const savedTheme = localStorage.getItem('theme') || 'dark'
+    
+    setCurrentPage(savedPage)
+    setSidebarCollapsed(isMobile ? true : savedSidebar)
+    setTheme(savedTheme)
+    
+    // Apply theme to body
+    document.documentElement.classList.toggle('dark', savedTheme === 'dark')
+  }, [isMobile])
 
   const showToast = (type, title, message) => {
     setNotificationData({ type, title, message })
@@ -49,70 +60,57 @@ function App() {
   }
 
   const toggleSidebar = () => {
-    setSidebarCollapsed(!sidebarCollapsed)
+    const newState = !sidebarCollapsed
+    setSidebarCollapsed(newState)
+    localStorage.setItem('sidebarCollapsed', newState)
   }
 
   const toggleTheme = () => {
     const newTheme = theme === 'dark' ? 'light' : 'dark'
     setTheme(newTheme)
-    showToast('info', 'Theme Changed', `Switched to ${newTheme} theme`)
+    localStorage.setItem('theme', newTheme)
+    document.documentElement.classList.toggle('dark', newTheme === 'dark')
+    showToast('success', 'Theme Updated', `Switched to ${newTheme} mode`)
   }
 
   const navigateTo = (page) => {
-    console.log('🔵 Navigating to:', page)
     setCurrentPage(page)
-    if (isMobile) {
-      setSidebarCollapsed(true)
-    }
+    localStorage.setItem('currentPage', page)
+    if (isMobile) setSidebarCollapsed(true)
   }
 
+  // Render current page
   const renderPage = () => {
-    console.log('🔵 Rendering page:', currentPage)
-    
-    try {
-      switch(currentPage) {
-        case 'dashboard':
-          return <Dashboard />
-        case 'users':
-          return <Users showToast={showToast} />
-        case 'analytics':
-          return <Analytics />
-        case 'ecommerce':
-          return <ECommerce />
-        case 'settings':
-          return <Settings showToast={showToast} />
-        case 'calendar':
-          return <Calendar />
-        case 'chat':
-          return <Chat />
-        case 'email':
-          return <Email />
-        case 'profile':
-          return <Profile />
-        case 'invoice':
-          return <Invoice />
-        default:
-          return <ECommerce />
-      }
-    } catch (error) {
-      console.error('🔴 Error rendering page:', error)
-      return (
-        <div className="p-8 text-center">
-          <div className="text-red-500 mb-4">Error loading page</div>
-          <button 
-            onClick={() => setCurrentPage('ecommerce')}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg"
-          >
-            Go to E-Commerce
-          </button>
-        </div>
-      )
+    switch(currentPage) {
+      case 'dashboard':
+        return <Dashboard showToast={showToast} />
+      case 'users':
+        return <Users showToast={showToast} />
+      case 'analytics':
+        return <Analytics showToast={showToast} />
+      case 'ecommerce':
+        return <ECommerce />
+      case 'settings':
+        return <Settings showToast={showToast} />
+      case 'calendar':
+        return <Calendar showToast={showToast} />
+      case 'chat':
+        return <Chat showToast={showToast} />
+      case 'email':
+        return <Email showToast={showToast} />
+      case 'profile':
+        return <Profile showToast={showToast} />
+      case 'invoice':
+        return <Invoice showToast={showToast} />
+      default:
+        return <ECommerce />
     }
   }
 
   return (
     <div className={`${theme === 'dark' ? 'dark' : ''}`}>
       <div className="flex min-h-screen bg-[#0a0a1a] text-white">
+        {/* Sidebar */}
         <Sidebar
           collapsed={sidebarCollapsed}
           currentPage={currentPage}
@@ -123,6 +121,7 @@ function App() {
           onThemeToggle={toggleTheme}
         />
         
+        {/* Main Content */}
         <div className={`flex-1 w-full transition-all duration-300 ${
           sidebarCollapsed 
             ? isMobile ? 'ml-0' : 'ml-20' 
@@ -134,6 +133,13 @@ function App() {
             onToggleTheme={toggleTheme}
             theme={theme}
             isMobile={isMobile}
+            userName="Admin User"
+            userRole="Administrator"
+            unreadNotifications={3}
+            unreadMessages={2}
+            onProfile={() => navigateTo('profile')}
+            onSettings={() => navigateTo('settings')}
+            onLogout={() => console.log('Logout')}
           />
           
           <main className="p-4 sm:p-6 md:p-8">
@@ -142,6 +148,7 @@ function App() {
         </div>
       </div>
 
+      {/* Notifications */}
       {showNotification && (
         <Notification
           type={notificationData.type}
