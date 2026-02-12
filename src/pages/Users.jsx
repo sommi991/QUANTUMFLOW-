@@ -1,279 +1,390 @@
-import { useState, useEffect } from 'react'
-import { FiSearch, FiFilter, FiDownload, FiPlus, FiEdit, FiTrash2 } from 'react-icons/fi'
-import Modal from '../components/Modal'
+
+import React, { useState } from 'react'
+import {
+  FiUsers, FiUser, FiMail, FiPhone, FiMapPin, FiCalendar,
+  FiShoppingBag, FiDollarSign, FiStar, FiSearch, FiPlus,
+  FiEdit, FiTrash2, FiEye, FiFilter, FiDownload, FiMoreVertical,
+  FiCheckCircle, FiXCircle, FiShield, FiLock, FiUnlock,
+  FiAward, FiMessageCircle, FiTag, FiClock
+} from 'react-icons/fi'
 
 const Users = ({ showToast }) => {
-  const [users, setUsers] = useState([])
-  const [filteredUsers, setFilteredUsers] = useState([])
-  const [search, setSearch] = useState('')
-  const [statusFilter, setStatusFilter] = useState('all')
-  const [roleFilter, setRoleFilter] = useState('all')
-  const [showAddModal, setShowAddModal] = useState(false)
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedRole, setSelectedRole] = useState('all')
+  const [selectedStatus, setSelectedStatus] = useState('all')
+  const [showUserModal, setShowUserModal] = useState(false)
   const [selectedUser, setSelectedUser] = useState(null)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
 
-  // Initial mock data
-  const initialUsers = [
+  const [users, setUsers] = useState([
     {
-      id: 1,
-      name: 'John Doe',
-      email: 'john@example.com',
-      phone: '+1 (555) 123-4567',
+      id: 'USR-001',
+      name: 'John Smith',
+      email: 'john.smith@example.com',
+      phone: '+1 555-0123',
       role: 'admin',
       status: 'active',
-      lastActive: '2 hours ago',
-      joinDate: '2024-01-15',
-      avatar: 'JD'
+      avatar: null,
+      lastActive: '2024-03-15 14:23',
+      joined: '2023-06-15',
+      orders: 45,
+      spent: 12450.75,
+      permissions: ['all'],
+      twoFactor: true,
+      department: 'Management'
     },
     {
-      id: 2,
-      name: 'Jane Smith',
-      email: 'jane@example.com',
-      phone: '+1 (555) 987-6543',
+      id: 'USR-002',
+      name: 'Sarah Johnson',
+      email: 'sarah.johnson@example.com',
+      phone: '+1 555-0456',
       role: 'manager',
       status: 'active',
-      lastActive: '1 day ago',
-      joinDate: '2024-01-20',
-      avatar: 'JS'
+      avatar: null,
+      lastActive: '2024-03-15 11:42',
+      joined: '2023-08-22',
+      orders: 28,
+      spent: 8345.50,
+      permissions: ['orders', 'products', 'customers'],
+      twoFactor: true,
+      department: 'Sales'
     },
     {
-      id: 3,
-      name: 'Robert Johnson',
-      email: 'robert@example.com',
-      phone: '+1 (555) 456-7890',
+      id: 'USR-003',
+      name: 'Michael Brown',
+      email: 'michael.brown@example.com',
+      phone: '+1 555-0789',
       role: 'editor',
-      status: 'pending',
-      lastActive: '3 days ago',
-      joinDate: '2024-02-01',
-      avatar: 'RJ'
+      status: 'active',
+      avatar: null,
+      lastActive: '2024-03-14 09:15',
+      joined: '2023-11-10',
+      orders: 12,
+      spent: 2345.25,
+      permissions: ['products'],
+      twoFactor: false,
+      department: 'Content'
     },
     {
-      id: 4,
-      name: 'Sarah Williams',
-      email: 'sarah@example.com',
-      phone: '+1 (555) 321-6547',
-      role: 'viewer',
+      id: 'USR-004',
+      name: 'Emma Wilson',
+      email: 'emma.wilson@example.com',
+      phone: '+1 555-0987',
+      role: 'customer',
       status: 'inactive',
-      lastActive: '1 week ago',
-      joinDate: '2024-02-10',
-      avatar: 'SW'
+      avatar: null,
+      lastActive: '2024-03-01 16:30',
+      joined: '2024-01-05',
+      orders: 3,
+      spent: 450.00,
+      permissions: [],
+      twoFactor: false,
+      department: null
+    },
+    {
+      id: 'USR-005',
+      name: 'David Lee',
+      email: 'david.lee@example.com',
+      phone: '+1 555-0654',
+      role: 'customer',
+      status: 'active',
+      avatar: null,
+      lastActive: '2024-03-15 10:05',
+      joined: '2024-02-18',
+      orders: 5,
+      spent: 890.50,
+      permissions: [],
+      twoFactor: false,
+      department: null
     }
+  ])
+
+  const roles = [
+    { id: 'admin', name: 'Administrator', color: 'text-red-400', bg: 'bg-red-500/10' },
+    { id: 'manager', name: 'Manager', color: 'text-blue-400', bg: 'bg-blue-500/10' },
+    { id: 'editor', name: 'Editor', color: 'text-green-400', bg: 'bg-green-500/10' },
+    { id: 'customer', name: 'Customer', color: 'text-gray-400', bg: 'bg-gray-500/10' }
   ]
 
-  useEffect(() => {
-    setUsers(initialUsers)
-    setFilteredUsers(initialUsers)
-  }, [])
-
-  useEffect(() => {
-    let result = users
+  const filteredUsers = users.filter(user => {
+    const matchesSearch = 
+      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.id.toLowerCase().includes(searchQuery.toLowerCase())
     
-    // Apply search filter
-    if (search) {
-      const searchLower = search.toLowerCase()
-      result = result.filter(user => 
-        user.name.toLowerCase().includes(searchLower) ||
-        user.email.toLowerCase().includes(searchLower) ||
-        user.phone.toLowerCase().includes(searchLower)
-      )
-    }
+    const matchesRole = selectedRole === 'all' || user.role === selectedRole
+    const matchesStatus = selectedStatus === 'all' || user.status === selectedStatus
     
-    // Apply status filter
-    if (statusFilter !== 'all') {
-      result = result.filter(user => user.status === statusFilter)
-    }
-    
-    // Apply role filter
-    if (roleFilter !== 'all') {
-      result = result.filter(user => user.role === roleFilter)
-    }
-    
-    setFilteredUsers(result)
-  }, [search, statusFilter, roleFilter, users])
+    return matchesSearch && matchesRole && matchesStatus
+  })
 
   const handleAddUser = (userData) => {
     const newUser = {
-      id: users.length + 1,
+      id: `USR-${String(users.length + 1).padStart(3, '0')}`,
       ...userData,
-      avatar: userData.name.split(' ').map(n => n[0]).join(''),
-      lastActive: 'Just now',
-      joinDate: new Date().toISOString().split('T')[0]
+      joined: new Date().toISOString().split('T')[0],
+      orders: 0,
+      spent: 0,
+      lastActive: new Date().toLocaleString()
     }
-    
     setUsers([newUser, ...users])
-    setShowAddModal(false)
-    showToast('success', 'User Added', `${userData.name} has been added successfully!`)
+    setShowUserModal(false)
+    showToast?.('✅ User added successfully!', 'success')
   }
 
-  const handleEditUser = (user) => {
-    setSelectedUser(user)
-    showToast('info', 'Edit User', `Editing ${user.name} - Implement edit functionality`)
-  }
-
-  const handleDeleteUser = (user) => {
-    setSelectedUser(user)
-    setShowDeleteModal(true)
-  }
-
-  const confirmDelete = () => {
-    setUsers(users.filter(u => u.id !== selectedUser.id))
-    setShowDeleteModal(false)
-    showToast('success', 'User Deleted', `${selectedUser.name} has been removed`)
+  const handleUpdateUser = (userData) => {
+    setUsers(users.map(u => u.id === userData.id ? { ...u, ...userData } : u))
+    setShowUserModal(false)
     setSelectedUser(null)
+    showToast?.('✅ User updated successfully!', 'success')
   }
 
-  const getStatusBadge = (status) => {
-    const classes = {
-      active: 'status-active',
-      pending: 'status-pending',
-      inactive: 'status-inactive'
-    }
-    return (
-      <span className={`status-badge ${classes[status] || 'status-inactive'}`}>
-        {status.charAt(0).toUpperCase() + status.slice(1)}
-      </span>
-    )
+  const handleDeleteUser = (userId) => {
+    setUsers(users.filter(u => u.id !== userId))
+    setShowDeleteModal(false)
+    showToast?.('✅ User deleted successfully!', 'success')
   }
 
-  const getRoleBadge = (role) => {
-    const colors = {
-      admin: 'from-blue-500 to-cyan-500',
-      manager: 'from-purple-500 to-pink-500',
-      editor: 'from-green-500 to-emerald-500',
-      viewer: 'from-gray-500 to-gray-700'
-    }
-    return (
-      <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${colors[role] || 'from-gray-500 to-gray-700'} text-white`}>
-        {role.charAt(0).toUpperCase() + role.slice(1)}
-      </span>
-    )
+  const handleToggleStatus = (userId) => {
+    setUsers(users.map(u => 
+      u.id === userId 
+        ? { ...u, status: u.status === 'active' ? 'inactive' : 'active' }
+        : u
+    ))
+    showToast?.('✅ User status updated!', 'success')
+  }
+
+  const handleToggleTwoFactor = (userId) => {
+    setUsers(users.map(u => 
+      u.id === userId 
+        ? { ...u, twoFactor: !u.twoFactor }
+        : u
+    ))
+    showToast?.('✅ Two-factor authentication updated!', 'success')
   }
 
   return (
-    <div>
+    <div className="space-y-6">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold gradient-text mb-2">User Management</h1>
-        <p className="text-gray-400">Manage user accounts, roles, and permissions with full CRUD operations</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl lg:text-3xl font-bold mb-2">User Management</h1>
+          <p className="text-gray-400">Manage your team members and customers</p>
+        </div>
+        
+        <button
+          onClick={() => {
+            setSelectedUser(null)
+            setShowUserModal(true)
+          }}
+          className="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:opacity-90 transition-all flex items-center gap-2 self-start"
+          style={{ pointerEvents: 'auto', cursor: 'pointer' }}
+        >
+          <FiPlus className="w-5 h-5" />
+          Add New User
+        </button>
       </div>
 
-      {/* Controls */}
-      <div className="glass-card p-6 mb-6">
-        <div className="flex flex-col md:flex-row gap-4 md:items-center">
-          <div className="flex-1 flex flex-wrap gap-4">
-            <div className="flex-1 min-w-[200px]">
-              <div className="relative">
-                <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search users..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="form-input pl-10"
-                />
-              </div>
+      {/* Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="glass-card p-6">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
+              <FiUsers className="w-6 h-6 text-white" />
             </div>
-            
-            <div className="flex gap-2">
-              <select 
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="form-input"
-              >
-                <option value="all">All Status</option>
-                <option value="active">Active</option>
-                <option value="pending">Pending</option>
-                <option value="inactive">Inactive</option>
-              </select>
-              
-              <select 
-                value={roleFilter}
-                onChange={(e) => setRoleFilter(e.target.value)}
-                className="form-input"
-              >
-                <option value="all">All Roles</option>
-                <option value="admin">Admin</option>
-                <option value="manager">Manager</option>
-                <option value="editor">Editor</option>
-                <option value="viewer">Viewer</option>
-              </select>
+            <div>
+              <div className="text-2xl font-bold">{users.length}</div>
+              <div className="text-sm text-gray-400">Total Users</div>
             </div>
           </div>
-          
-          <div className="flex gap-3">
-            <button 
-              onClick={() => showToast('info', 'Export', 'Export functionality would be implemented')}
-              className="btn-secondary flex items-center"
-            >
-              <FiDownload className="mr-2" />
-              Export CSV
-            </button>
-            <button 
-              onClick={() => setShowAddModal(true)}
-              className="btn-primary flex items-center"
-            >
-              <FiPlus className="mr-2" />
-              Add User
-            </button>
+        </div>
+        
+        <div className="glass-card p-6">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
+              <FiCheckCircle className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-green-400">
+                {users.filter(u => u.status === 'active').length}
+              </div>
+              <div className="text-sm text-gray-400">Active Users</div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="glass-card p-6">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+              <FiShield className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-purple-400">
+                {users.filter(u => u.role === 'admin' || u.role === 'manager').length}
+              </div>
+              <div className="text-sm text-gray-400">Administrators</div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="glass-card p-6">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center">
+              <FiShoppingBag className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-yellow-400">
+                {users.reduce((sum, u) => sum + u.orders, 0)}
+              </div>
+              <div className="text-sm text-gray-400">Total Orders</div>
+            </div>
           </div>
         </div>
       </div>
 
+      {/* Filters */}
+      <div className="glass-card p-4">
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex-1 relative">
+            <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="text"
+              placeholder="Search users..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-blue-500/50 focus:outline-none transition-colors"
+              style={{ pointerEvents: 'auto' }}
+            />
+          </div>
+          
+          <select
+            value={selectedRole}
+            onChange={(e) => setSelectedRole(e.target.value)}
+            className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-blue-500/50 focus:outline-none transition-colors"
+            style={{ pointerEvents: 'auto', cursor: 'pointer' }}
+          >
+            <option value="all">All Roles</option>
+            {roles.map(role => (
+              <option key={role.id} value={role.id}>{role.name}s</option>
+            ))}
+          </select>
+          
+          <select
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value)}
+            className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-blue-500/50 focus:outline-none transition-colors"
+            style={{ pointerEvents: 'auto', cursor: 'pointer' }}
+          >
+            <option value="all">All Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+          
+          <button
+            className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors flex items-center gap-2"
+            style={{ pointerEvents: 'auto', cursor: 'pointer' }}
+          >
+            <FiDownload className="w-4 h-4" />
+            Export
+          </button>
+        </div>
+      </div>
+
       {/* Users Table */}
-      <div className="glass-card p-6">
+      <div className="glass-card overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="table">
+          <table className="w-full">
             <thead>
-              <tr>
-                <th>User</th>
-                <th>Contact</th>
-                <th>Role</th>
-                <th>Status</th>
-                <th>Activity</th>
-                <th>Actions</th>
+              <tr className="border-b border-white/10 bg-white/5">
+                <th className="p-4 text-left text-sm font-semibold text-gray-400">User</th>
+                <th className="p-4 text-left text-sm font-semibold text-gray-400">Role</th>
+                <th className="p-4 text-left text-sm font-semibold text-gray-400">Contact</th>
+                <th className="p-4 text-left text-sm font-semibold text-gray-400">Status</th>
+                <th className="p-4 text-left text-sm font-semibold text-gray-400">2FA</th>
+                <th className="p-4 text-left text-sm font-semibold text-gray-400">Orders</th>
+                <th className="p-4 text-left text-sm font-semibold text-gray-400">Spent</th>
+                <th className="p-4 text-left text-sm font-semibold text-gray-400">Last Active</th>
+                <th className="p-4 text-left text-sm font-semibold text-gray-400">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {filteredUsers.map((user) => (
-                <tr key={user.id}>
-                  <td>
+              {filteredUsers.map(user => (
+                <tr key={user.id} className="border-b border-white/10 hover:bg-white/5 transition-colors">
+                  <td className="p-4">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold">
-                        {user.avatar}
+                        {user.name.split(' ').map(n => n[0]).join('')}
                       </div>
                       <div>
                         <div className="font-semibold">{user.name}</div>
-                        <div className="text-sm text-gray-400">Joined {user.joinDate}</div>
+                        <div className="text-xs text-gray-400">{user.id}</div>
                       </div>
                     </div>
                   </td>
-                  <td>
-                    <div className="space-y-1">
-                      <div className="font-medium">{user.email}</div>
-                      <div className="text-sm text-gray-400">{user.phone}</div>
-                    </div>
+                  <td className="p-4">
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                      roles.find(r => r.id === user.role)?.bg || 'bg-gray-500/10'
+                    } ${roles.find(r => r.id === user.role)?.color || 'text-gray-400'}`}>
+                      {roles.find(r => r.id === user.role)?.name || user.role}
+                    </span>
+                    {user.department && (
+                      <div className="text-xs text-gray-500 mt-1">{user.department}</div>
+                    )}
                   </td>
-                  <td>{getRoleBadge(user.role)}</td>
-                  <td>{getStatusBadge(user.status)}</td>
-                  <td>
-                    <div className="text-sm">
-                      <div className="font-medium">Last Active</div>
-                      <div className="text-gray-400">{user.lastActive}</div>
-                    </div>
+                  <td className="p-4">
+                    <div className="text-sm">{user.email}</div>
+                    <div className="text-xs text-gray-400">{user.phone}</div>
                   </td>
-                  <td>
-                    <div className="flex gap-2">
+                  <td className="p-4">
+                    <button
+                      onClick={() => handleToggleStatus(user.id)}
+                      className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${
+                        user.status === 'active' 
+                          ? 'bg-green-500/10 text-green-500 hover:bg-green-500/20'
+                          : 'bg-gray-500/10 text-gray-400 hover:bg-gray-500/20'
+                      }`}
+                      style={{ pointerEvents: 'auto', cursor: 'pointer' }}
+                    >
+                      {user.status === 'active' ? <FiCheckCircle className="w-3 h-3" /> : <FiXCircle className="w-3 h-3" />}
+                      {user.status}
+                    </button>
+                  </td>
+                  <td className="p-4">
+                    <button
+                      onClick={() => handleToggleTwoFactor(user.id)}
+                      className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${
+                        user.twoFactor 
+                          ? 'bg-blue-500/10 text-blue-400 hover:bg-blue-500/20'
+                          : 'bg-gray-500/10 text-gray-400 hover:bg-gray-500/20'
+                      }`}
+                      style={{ pointerEvents: 'auto', cursor: 'pointer' }}
+                    >
+                      {user.twoFactor ? <FiLock className="w-3 h-3" /> : <FiUnlock className="w-3 h-3" />}
+                      {user.twoFactor ? 'Enabled' : 'Disabled'}
+                    </button>
+                  </td>
+                  <td className="p-4 font-semibold">{user.orders}</td>
+                  <td className="p-4 font-semibold text-blue-400">${user.spent.toFixed(2)}</td>
+                  <td className="p-4 text-sm text-gray-400">{user.lastActive}</td>
+                  <td className="p-4">
+                    <div className="flex items-center gap-2">
                       <button
-                        onClick={() => handleEditUser(user)}
-                        className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
-                        title="Edit"
+                        onClick={() => {
+                          setSelectedUser(user)
+                          setShowUserModal(true)
+                        }}
+                        className="p-2 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20"
+                        style={{ pointerEvents: 'auto', cursor: 'pointer' }}
                       >
                         <FiEdit className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => handleDeleteUser(user)}
-                        className="w-8 h-8 flex items-center justify-center rounded-lg bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 transition-colors text-red-400"
-                        title="Delete"
+                        onClick={() => {
+                          setSelectedUser(user)
+                          setShowDeleteModal(true)
+                        }}
+                        className="p-2 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20"
+                        style={{ pointerEvents: 'auto', cursor: 'pointer' }}
                       >
                         <FiTrash2 className="w-4 h-4" />
                       </button>
@@ -281,183 +392,224 @@ const Users = ({ showToast }) => {
                   </td>
                 </tr>
               ))}
-              
-              {filteredUsers.length === 0 && (
-                <tr>
-                  <td colSpan="6" className="text-center py-8 text-gray-400">
-                    No users found matching your criteria
-                  </td>
-                </tr>
-              )}
             </tbody>
           </table>
         </div>
-        
-        {/* Pagination */}
-        <div className="flex justify-between items-center mt-6 pt-6 border-t border-white/10">
-          <div className="text-sm text-gray-400">
-            Showing {filteredUsers.length} of {users.length} users
-          </div>
-          <div className="flex gap-2">
-            <button className="px-3 py-1 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
-              Previous
-            </button>
-            <button className="px-3 py-1 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 text-white">
-              1
-            </button>
-            <button className="px-3 py-1 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
-              2
-            </button>
-            <button className="px-3 py-1 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
-              Next
-            </button>
-          </div>
-        </div>
       </div>
 
-      {/* Add User Modal */}
-      <Modal
-        isOpen={showAddModal}
-        onClose={() => setShowAddModal(false)}
-        title="Add New User"
-      >
-        <form onSubmit={(e) => {
-          e.preventDefault()
-          const formData = new FormData(e.target)
-          const userData = {
-            name: formData.get('name'),
-            email: formData.get('email'),
-            phone: formData.get('phone'),
-            role: formData.get('role'),
-            status: formData.get('status')
-          }
-          handleAddUser(userData)
-          e.target.reset()
-        }}>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">Full Name *</label>
-              <input
-                name="name"
-                type="text"
-                required
-                className="form-input"
-                placeholder="John Doe"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium mb-2">Email Address *</label>
-              <input
-                name="email"
-                type="email"
-                required
-                className="form-input"
-                placeholder="john@example.com"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium mb-2">Phone Number</label>
-              <input
-                name="phone"
-                type="tel"
-                className="form-input"
-                placeholder="+1 (555) 123-4567"
-              />
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">Role *</label>
-                <select name="role" className="form-input" required>
-                  <option value="">Select Role</option>
-                  <option value="admin">Administrator</option>
-                  <option value="manager">Manager</option>
-                  <option value="editor">Editor</option>
-                  <option value="viewer">Viewer</option>
-                </select>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium mb-2">Status</label>
-                <select name="status" className="form-input">
-                  <option value="active">Active</option>
-                  <option value="pending">Pending</option>
-                  <option value="inactive">Inactive</option>
-                </select>
-              </div>
-            </div>
-            
-            <div className="pt-4">
-              <h4 className="text-sm font-medium mb-3">Permissions</h4>
-              <div className="space-y-2">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" defaultChecked className="rounded bg-white/5 border-white/10" />
-                  <span className="text-sm">Read Access</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" className="rounded bg-white/5 border-white/10" />
-                  <span className="text-sm">Write Access</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" className="rounded bg-white/5 border-white/10" />
-                  <span className="text-sm">Delete Access</span>
-                </label>
-              </div>
-            </div>
-            
-            <div className="flex justify-end gap-3 pt-6 border-t border-white/10">
-              <button
-                type="button"
-                onClick={() => setShowAddModal(false)}
-                className="btn-secondary"
-              >
-                Cancel
-              </button>
-              <button type="submit" className="btn-primary">
-                Save User
-              </button>
-            </div>
-          </div>
-        </form>
-      </Modal>
+      {/* User Modal */}
+      {showUserModal && (
+        <UserModal
+          user={selectedUser}
+          roles={roles}
+          onSave={selectedUser ? handleUpdateUser : handleAddUser}
+          onClose={() => {
+            setShowUserModal(false)
+            setSelectedUser(null)
+          }}
+        />
+      )}
 
-      {/* Delete Confirmation Modal */}
-      <Modal
-        isOpen={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        title="Confirm Delete"
-        size="sm"
-      >
-        <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-red-500 to-pink-500 flex items-center justify-center">
-            <FiTrash2 className="w-8 h-8 text-white" />
-          </div>
-          
-          <h3 className="text-lg font-semibold mb-2">Delete User</h3>
-          <p className="text-gray-400 mb-6">
-            Are you sure you want to delete <span className="font-semibold text-white">{selectedUser?.name}</span>? This action cannot be undone.
-          </p>
-          
-          <div className="flex gap-3">
-            <button
-              onClick={() => setShowDeleteModal(false)}
-              className="btn-secondary flex-1"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={confirmDelete}
-              className="btn-primary flex-1 bg-gradient-to-r from-red-500 to-pink-500"
-            >
-              Delete
-            </button>
-          </div>
-        </div>
-      </Modal>
+      {/* Delete Modal */}
+      {showDeleteModal && selectedUser && (
+        <DeleteModal
+          userName={selectedUser.name}
+          onConfirm={() => handleDeleteUser(selectedUser.id)}
+          onCancel={() => {
+            setShowDeleteModal(false)
+            setSelectedUser(null)
+          }}
+        />
+      )}
     </div>
   )
 }
 
+const UserModal = ({ user, roles, onSave, onClose }) => {
+  const [formData, setFormData] = useState(user || {
+    name: '',
+    email: '',
+    phone: '',
+    role: 'customer',
+    status: 'active',
+    department: '',
+    twoFactor: false
+  })
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    onSave(formData)
+  }
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content max-w-2xl" onClick={(e) => e.stopPropagation()}>
+        <div className="p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-xl font-bold flex items-center gap-2">
+              <FiUser className="w-5 h-5" />
+              {user ? 'Edit User' : 'Add New User'}
+            </h3>
+            <button
+              onClick={onClose}
+              className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+              style={{ pointerEvents: 'auto', cursor: 'pointer' }}
+            >
+              <FiX className="w-5 h-5" />
+            </button>
+          </div>
+          
+          <form onSubmit={handleSubmit}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="md:col-span-2">
+                <label className="block text-sm text-gray-400 mb-1">Full Name *</label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="form-input"
+                  required
+                  style={{ pointerEvents: 'auto' }}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Email *</label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="form-input"
+                  required
+                  style={{ pointerEvents: 'auto' }}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Phone *</label>
+                <input
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  className="form-input"
+                  required
+                  style={{ pointerEvents: 'auto' }}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Role *</label>
+                <select
+                  value={formData.role}
+                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                  className="form-input"
+                  required
+                  style={{ pointerEvents: 'auto' }}
+                >
+                  {roles.map(role => (
+                    <option key={role.id} value={role.id}>{role.name}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Status</label>
+                <select
+                  value={formData.status}
+                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                  className="form-input"
+                  style={{ pointerEvents: 'auto' }}
+                >
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Department</label>
+                <input
+                  type="text"
+                  value={formData.department || ''}
+                  onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                  className="form-input"
+                  placeholder="e.g. Sales, Marketing"
+                  style={{ pointerEvents: 'auto' }}
+                />
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="twoFactor"
+                  checked={formData.twoFactor}
+                  onChange={(e) => setFormData({ ...formData, twoFactor: e.target.checked })}
+                  className="w-5 h-5 rounded border-white/10 bg-white/5"
+                  style={{ pointerEvents: 'auto', cursor: 'pointer' }}
+                />
+                <label htmlFor="twoFactor" className="text-sm text-gray-400">
+                  Enable Two-Factor Authentication
+                </label>
+              </div>
+            </div>
+            
+            <div className="flex gap-3 mt-6">
+              <button
+                type="submit"
+                className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:opacity-90"
+                style={{ pointerEvents: 'auto', cursor: 'pointer' }}
+              >
+                <FiSave className="inline w-4 h-4 mr-2" />
+                {user ? 'Update User' : 'Add User'}
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
+                style={{ pointerEvents: 'auto', cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const DeleteModal = ({ userName, onConfirm, onCancel }) => (
+  <div className="modal-overlay" onClick={onCancel}>
+    <div className="modal-content max-w-md" onClick={(e) => e.stopPropagation()}>
+      <div className="p-6 text-center">
+        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-500/10 flex items-center justify-center">
+          <FiTrash2 className="w-8 h-8 text-red-500" />
+        </div>
+        <h3 className="text-xl font-bold mb-2">Delete User</h3>
+        <p className="text-gray-400 mb-6">
+          Are you sure you want to delete <span className="font-semibold text-white">{userName}</span>? 
+          This action cannot be undone.
+        </p>
+        
+        <div className="flex gap-3">
+          <button
+            onClick={onCancel}
+            className="flex-1 px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
+            style={{ pointerEvents: 'auto', cursor: 'pointer' }}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-red-500 to-pink-500 text-white hover:opacity-90"
+            style={{ pointerEvents: 'auto', cursor: 'pointer' }}
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)
+
+import { FiX, FiSave } from 'react-icons/fi'
 export default Users
